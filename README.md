@@ -1,10 +1,23 @@
-# gitlab
+# GitLab Puppet Module
 
-This is a gitlab puppet module.
+This Puppet module installs, manages and configures the [GitLab](http://gitlab.org/) open source code repository. This module installs and manages [Apache](http://httpd.apache.org/) and [Passenger](https://www.phusionpassenger.com/) using the [Puppetlabs Apache Module](https://github.com/puppetlabs/puppetlabs-apache). Apache is used instead of [Ngnix](http://nginx.org/) as there are some authorisation models that have already been solved for Apache and not yet resolved for Ngnix.
 
-# Licensing
+# References
 
-Update your license details here.
+## Other GitLab puppet modules
+
+These are good implementations, but install GitLab on Ngnix, which is not what's being done here.
+
+* https://github.com/sbadia/puppet-gitlab
+* https://github.com/spuder/puppet-gitlab
+* https://github.com/lboynton/puppet-gitlab
+
+GitLab installation references
+* http://k-d-w.org/node/94
+* https://www.digitalocean.com/community/articles/how-to-set-up-gitlab-as-your-very-own-private-github-clone
+* https://shanetully.com/2012/08/running-gitlab-from-a-subdirectory-on-apache/
+* https://github.com/gitlabhq/gitlabhq/blob/master/doc/install/installation.md
+
 
 # Attribution
 

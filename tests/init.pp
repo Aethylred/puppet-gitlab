@@ -12,4 +12,25 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with the gitlab Puppet module.  If not, see <http://www.gnu.org/licenses/>.
-include gitlab
+include apt
+apt::ppa{'ppa:git-core/ppa':}
+apt::ppa{'ppa:brightbox/ruby-ng-experimental':}
+class{'git':
+  require => Apt::Ppa['ppa:git-core/ppa'],
+}
+include apache
+include apache::mod::passenger
+
+class{'python':
+  version => 2.7,
+}
+
+class{'ruby':
+  version => '2.0',
+  switch  => true,
+  require => Apt::Ppa['ppa:brightbox/ruby-ng-experimental']
+}
+
+class{'gitlab':
+  require  => [Class['ruby','python','git']]
+}
