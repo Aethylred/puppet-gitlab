@@ -1,0 +1,23 @@
+{
+  "name": "Aethylred-gitlab",
+  "version": "0.0.1",
+  "author": "Aaron Hicks",
+  "license": "Licensed under GPL3",
+  "summary": "A module for installing and managing GitLab with Apache",
+  "source": "https://github.com/Aethylred/puppet-gitlab",
+  "project_page": "https://github.com/Aethylred/puppet-gitlab",
+  "issues_url": "https://github.com/Aethylred/puppet-gitlab/issues",
+  "tags": ["gitlab", "apache"],
+  "operatingsystem_support": [
+    {
+    "operatingsystem": "Ubuntu",
+    "operatingsystemrelease": [ "12.04", "13.10" ],
+    },
+   ],
+  "dependencies": [
+    { "name": "puppetlabs/stdlib", "version_requirement": ">=3.2.0 <5.0.0" },
+    { "name": "puppetlabs/apache", "version_requirement": ">=1.0.0 <2.0.0" },
+    { "name": "puppetlabs/vcsrepo", "version_requirement": ">=1.0.0 <2.0.0" },
+    { "name": "Aethylred/git", "version_requirement": ">=0.1.0 <1.0.0" },
+  ] 
+}
