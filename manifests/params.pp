@@ -1,6 +1,8 @@
 class gitlab::params {
-  $user = 'git'
-  $user_home = '/home/git'
+  $user               = 'git'
+  $user_home          = '/home/git'
+  $gitlab_shell_repo  = 'https://gitlab.com/gitlab-org/gitlab-shell.git'
+  $gitlab_shell_rev   = 'v1.8.0'
 
   case $::osfamily {
     Debian:{

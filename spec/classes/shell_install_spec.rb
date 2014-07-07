@@ -1,5 +1,5 @@
 require 'spec_helper'
-describe 'gitlab', :type => :class do
+describe 'gitlab::shell::install', :type => :class do
   context 'on a Debian OS' do
     let :facts do
       {
@@ -9,19 +9,28 @@ describe 'gitlab', :type => :class do
     end
     describe 'with no parameters' do
       it { should contain_class('gitlab::params') }
-      it { should contain_user('gitlab').with(
-        'ensure'        => 'present',
-        'name'          => 'git',
-        'home'          => '/home/git',
-        'comment'       => 'GitLab services and application user',
-        'managehome'    => true,
-        'shell'         => '/bin/bash'
+      it { should contain_vcsrepo('gitlab-shell').with(
+        'ensure'    => 'present',
+        'path'      => '/home/git/gitlab-shell',
+        'provider'  => 'git',
+        'user'      => 'git',
+        'source'    => 'https://gitlab.com/gitlab-org/gitlab-shell.git',
+        'revision'  => 'v1.8.0',
+        'require'   => 'User[gitlab]'
       ) }
-      it { should contain_class('gitlab::shell::install').with(
+      it { should contain_file('gitlab-shell-config').with(
+        'ensure'  => 'file',
+        'path'    => '/home/git/gitlab-shell/config.yml',
+        'owner'   => 'git',
+        'group'   => 'git',
+        'require' => 'Vcsrepo[gitlab-shell]'
+      )}
+      it { should contain_exec('gitlab_shell_install').with(
+        'cwd'         => '/home/git',
         'user'        => 'git',
-        'user_home'   => '/home/git',
-        'repository'  => 'https://gitlab.com/gitlab-org/gitlab-shell.git',
-        'revision'    => 'v1.8.0'
+        'command'     => '/home/git/gitlab-shell/bin/install',
+        'subscribe'   => 'File[gitlab-shell-config]',
+        'refreshonly' => true
       ) }
     end
   end

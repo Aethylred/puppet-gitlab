@@ -28,13 +28,16 @@
 
 # [Remember: No empty lines between comments and class definition]
 class gitlab (
-  $gitlab_url       = 'http://localhost',
-  $user             = $gitlab::params::user,
-  $user_home        = $gitlab::params::user_home,
-  $selfsigned_certs = undef,
-  $audit_usernames  = undef,
-  $log_level        = 'INFO',
-  $gl_shell_logfile = undef,
+  $gitlab_url         = 'http://localhost',
+  $user               = $::gitlab::params::user,
+  $user_home          = $::gitlab::params::user_home,
+  $install_gl_shell   = true,
+  $gitlab_shell_repo  = $::gitlab::params::gitlab_shell_repo,
+  $gitlab_shell_rev   = $::gitlab::params::gitlab_shell_rev,
+  $selfsigned_certs   = undef,
+  $audit_usernames    = undef,
+  $log_level          = 'INFO',
+  $gl_shell_logfile   = undef
 ) inherits gitlab::params {
 
   user{'gitlab':
@@ -46,31 +49,14 @@ class gitlab (
     shell         => '/bin/bash',
   }
 
-  vcsrepo{'gitlab-shell':
-    ensure    => present,
-    name      => "${user_home}/gitlab-shell",
-    provider  => git,
-    user      => $user,
-    source    => 'https://gitlab.com/gitlab-org/gitlab-shell.git',
-    revision  => 'v1.8.0',
-    require   => User['gitlab'],
+  if $install_gl_shell {
+    class{'gitlab::shell::install':
+      user        => $user,
+      user_home   => $user_home,
+      repository  => $gitlab_shell_repo,
+      revision    => $gitlab_shell_rev,
+    }
   }
 
-  file{'gitlab-shell-config':
-    ensure  => file,
-    path    => "${user_home}/gitlab-shell/config.yml",
-    owner   => $user,
-    group   => $user,
-    content => template('gitlab/gitlab-shell-config.yml.erb'),
-    require => Vcsrepo['gitlab-shell'],
-  }
-
-  exec{'gitlab_shell_install':
-    cwd         => $user_home,
-    user        => $user,
-    command     => "${user_home}/gitlab-shell/bin/install",
-    subscribe   => File['gitlab-shell-config'],
-    refreshonly => true,
-  }
 
 }
