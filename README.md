@@ -1,6 +1,6 @@
 # GitLab Puppet Module
 
-This Puppet module installs, manages and configures the [GitLab](http://gitlab.org/) open source code repository. This module installs and manages [Apache](http://httpd.apache.org/) and [Passenger](https://www.phusionpassenger.com/) using the [Puppetlabs Apache Module](https://github.com/puppetlabs/puppetlabs-apache). Apache is used instead of [Ngnix](http://nginx.org/) as there are some authorisation models that have already been solved for Apache and not yet resolved for Ngnix.
+This Puppet module installs, manages and configures the [GitLab](http://gitlab.org/) open source code repository. This module configures GitLab to run on [Apache](http://httpd.apache.org/) and [Passenger](https://www.phusionpassenger.com/) using the [Puppetlabs Apache Module](https://github.com/puppetlabs/puppetlabs-apache). Apache is used instead of [Ngnix](http://nginx.org/) as there are some authorisation models that have already been solved for Apache and not yet resolved for Ngnix.
 
 # References
 
@@ -13,6 +13,8 @@ These are good implementations, but install GitLab on Ngnix, which is not what's
 * https://github.com/lboynton/puppet-gitlab
 
 GitLab installation references
+* https://gitlab.com/gitlab-org/cookbook-gitlab/tree/master
+* https://github.com/gitlabhq/gitlab-recipes/tree/master/web-server/apache
 * http://k-d-w.org/node/94
 * https://www.digitalocean.com/community/articles/how-to-set-up-gitlab-as-your-very-own-private-github-clone
 * https://shanetully.com/2012/08/running-gitlab-from-a-subdirectory-on-apache/

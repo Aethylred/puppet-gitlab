@@ -1,5 +1,5 @@
 require 'spec_helper'
-describe 'gitlab', :type => :class do
+describe 'gitlab::db::postgresql', :type => :class do
   context 'on a Debian OS' do
     let :facts do
       {
@@ -8,31 +8,24 @@ describe 'gitlab', :type => :class do
         :fqdn           => 'test.example.org',
       }
     end
+    let :pre_condition do
+      'include gitlab'
+    end
     describe 'with no parameters' do
       it { should contain_class('gitlab::params') }
-      it { should contain_user('gitlab').with(
-        'ensure'        => 'present',
-        'name'          => 'git',
-        'home'          => '/home/git',
-        'password'      => '!',
-        'comment'       => 'GitLab services and application user',
-        'managehome'    => true,
-        'shell'         => '/bin/bash'
+      it { should contain_postgresql__server__role('git').with(
+        'username'      => 'git',
+        'password_hash' => 'md5f2f2886b0ee1037bb6d1c40fca97db70'
       ) }
-      it { should contain_class('gitlab::shell::install').with(
-        'user'        => 'git',
-        'user_home'   => '/home/git',
-        'repository'  => 'https://gitlab.com/gitlab-org/gitlab-shell.git',
-        'revision'    => 'v1.8.0'
+      it { should contain_postgresql__server__database('gitlab').with(
+        'dbname'    => 'gitlab',
+        'owner'     => 'git'
       ) }
-      it { should contain_class('gitlab::db::postgresql').with(
-        'db_user'             => 'git',
-        'db_name'             => 'gitlab',
-        'db_user_password'    => 'veryveryunsafe',
-        'db_user_passwd_hash' => $db_user_passwd_hash,
-        'gitlab_server'       => 'test.example.org',
-        'db_host'             => 'test.example.org',
-      )}
+      it { should contain_postgresql__server__database_grant('gitlab_db_grant').with(
+        'db'        => 'gitlab',
+        'role'      => 'git',
+        'privilege' => 'ALL'
+      ) }
     end
   end
 

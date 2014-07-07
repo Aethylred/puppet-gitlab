@@ -1,6 +1,6 @@
 class gitlab::shell::install (
-  $user       = $::gitlab::params::user,
-  $user_home  = $::gitlab::params::user_home,
+  $user       = $::gitlab::user,
+  $user_home  = $::gitlab::user_home,
   $repository = $::gitlab::params::gitlab_shell_repo,
   $revision   = $::gitlab::params::gitlab_shell_rev
 ) inherits gitlab::params {

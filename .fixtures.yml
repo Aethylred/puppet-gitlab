@@ -12,5 +12,8 @@ fixtures:
     vcsrepo:
       repo: 'puppetlabs-vcsrepo'
       ref:  '1.0.2'
+    postgresql:
+      repo: 'puppetlabs-postgresql'
+      ref:  '3.3.3'
   symlinks:
     gitlab: "#{source_dir}"

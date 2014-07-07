@@ -14,6 +14,8 @@ class{'ruby':
   require => Apt::Ppa['ppa:brightbox/ruby-ng-experimental']
 }
 
+include postgresql::server
+
 class{'gitlab':
   require  => [Class['ruby','git']]
 }

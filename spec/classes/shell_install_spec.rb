@@ -5,7 +5,11 @@ describe 'gitlab::shell::install', :type => :class do
       {
         :osfamily       => 'Debian',
         :concat_basedir => '/dne',
+        :fqdn           => 'test.example.org',
       }
+    end
+    let :pre_condition do
+      'include gitlab'
     end
     describe 'with no parameters' do
       it { should contain_class('gitlab::params') }
