@@ -37,6 +37,36 @@ describe 'gitlab::shell::install', :type => :class do
           'subscribe'   => 'File[gitlab-shell-config]',
           'refreshonly' => true
         ) }
+        it {should contain_file('gitlab-shell-config').with_content(
+          %r{^user: git$}
+        ) }
+        it {should contain_file('gitlab-shell-config').with_content(
+          %r{^gitlab_url: "http://localhost/"$}
+        ) }
+        it {should contain_file('gitlab-shell-config').with_content(
+          %r{^  self_signed_cert: true$}
+        ) }
+        it {should contain_file('gitlab-shell-config').with_content(
+          %r{^repos_path: "/home/git/repositories"$}
+        ) }
+        it {should contain_file('gitlab-shell-config').with_content(
+          %r{^auth_file: "/home/git/.ssh/authorized_keys"$}
+        ) }
+        it {should contain_file('gitlab-shell-config').with_content(
+          %r{^log_level: INFO$}
+        ) }
+        it {should contain_file('gitlab-shell-config').with_content(
+          %r{^audit_usernames: false$}
+        ) }
+        it {should contain_file('gitlab-shell-config').without_content(
+          %r{^  self_signed_cert: false$}
+        ) }
+        it {should contain_file('gitlab-shell-config').without_content(
+          %r{^log_file: .*$}
+        ) }
+        it {should contain_file('gitlab-shell-config').without_content(
+          %r{^audit_usernames: true$}
+        ) }
       end
       describe 'when given a user' do
         let :params do
@@ -53,6 +83,12 @@ describe 'gitlab::shell::install', :type => :class do
         )}
         it { should contain_exec('gitlab_shell_install').with(
           'user'    => 'notgit'
+        ) }
+        it {should contain_file('gitlab-shell-config').with_content(
+          %r{^user: notgit$}
+        ) }
+        it {should contain_file('gitlab-shell-config').without_content(
+          %r{^user: git$}
         ) }
       end
       describe 'when given a user home directory' do
@@ -89,6 +125,42 @@ describe 'gitlab::shell::install', :type => :class do
         end
         it { should contain_vcsrepo('gitlab-shell').with(
           'revision'  => 'test'
+        ) }
+      end
+      describe 'when given parameters for the config file' do
+        let :params do
+          {
+            :repository_dir   => '/path/to/dir',
+            :auth_file        => '/path/to/file',
+            :selfsigned_certs => false,
+            :audit_usernames  => true,
+            :log_level        => 'WARN',
+            :gl_shell_logfile => '/path/to/log/file.log'
+          }
+        end
+        it {should contain_file('gitlab-shell-config').with_content(
+          %r{^  self_signed_cert: false$}
+        ) }
+        it {should contain_file('gitlab-shell-config').with_content(
+          %r{^repos_path: "/path/to/dir"$}
+        ) }
+        it {should contain_file('gitlab-shell-config').with_content(
+          %r{^auth_file: "/path/to/file"$}
+        ) }
+        it {should contain_file('gitlab-shell-config').with_content(
+          %r{^log_level: WARN$}
+        ) }
+        it {should contain_file('gitlab-shell-config').with_content(
+          %r{^audit_usernames: true$}
+        ) }
+        it {should contain_file('gitlab-shell-config').with_content(
+          %r{^log_file: "/path/to/log/file.log"$}
+        ) }
+        it {should contain_file('gitlab-shell-config').without_content(
+          %r{^  self_signed_cert: true$}
+        ) }
+        it {should contain_file('gitlab-shell-config').without_content(
+          %r{^audit_usernames: false$}
         ) }
       end
     end

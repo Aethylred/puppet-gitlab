@@ -28,7 +28,7 @@
 
 # [Remember: No empty lines between comments and class definition]
 class gitlab (
-  $gitlab_url           = 'http://localhost',
+  $gitlab_url           = 'http://localhost/',
   $user                 = $::gitlab::params::user,
   $user_home            = $::gitlab::params::user_home,
   $install_gl_shell     = true,
@@ -40,7 +40,7 @@ class gitlab (
   $db_user_password     = 'veryveryunsafe',
   $db_user_passwd_hash  = undef,
   $servername           = $::fqdn,
-  $selfsigned_certs     = undef,
+  $selfsigned_certs     = true,
   $audit_usernames      = undef,
   $log_level            = 'INFO',
   $gl_shell_logfile     = undef
@@ -63,12 +63,36 @@ class gitlab (
     recurse => true,
   }
 
+  $repository_dir = "${user_home}/repositories"
+  $auth_file      = "${user_home}/.ssh/authorized_keys"
+
+  file{'gitlab_repostiories_dir':
+    ensure  => 'directory',
+    path    => $repository_dir,
+    owner   => $user,
+    recurse => true,
+  }
+
+  file{'gitlab_auth_file':
+    ensure  => 'file',
+    path    => $auth_file,
+    owner   => $user,
+    mode    => '0600',
+  }
+
   if $install_gl_shell {
     class{'gitlab::shell::install':
-      user        => $user,
-      user_home   => $user_home,
-      repository  => $gitlab_shell_repo,
-      revision    => $gitlab_shell_rev,
+      gitlab_url        => $gitlab_url,
+      user              => $user,
+      user_home         => $user_home,
+      repository        => $gitlab_shell_repo,
+      revision          => $gitlab_shell_rev,
+      repository_dir    => $repository_dir,
+      auth_file         => $auth_file,
+      selfsigned_certs  => $selfsigned_certs,
+      audit_usernames   => $audit_usernames,
+      log_level         => $log_level,
+      gl_shell_logfile  => $gl_shell_logfile,
     }
   }
 

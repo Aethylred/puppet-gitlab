@@ -1,8 +1,15 @@
 class gitlab::shell::install (
-  $user       = $::gitlab::user,
-  $user_home  = $::gitlab::user_home,
-  $repository = $::gitlab::params::gitlab_shell_repo,
-  $revision   = $::gitlab::params::gitlab_shell_rev
+  $gitlab_url       = $::gitlab::gitlab_url,
+  $user             = $::gitlab::user,
+  $user_home        = $::gitlab::user_home,
+  $repository       = $::gitlab::params::gitlab_shell_repo,
+  $revision         = $::gitlab::params::gitlab_shell_rev,
+  $repository_dir   = $::gitlab::repository_dir,
+  $auth_file        = $::gitlab::auth_file,
+  $selfsigned_certs = $::gitlab::selfsigned_certs,
+  $audit_usernames  = $::gitlab::audit_usernames,
+  $log_level        = $::gitlab::log_level,
+  $gl_shell_logfile = $::gitlab::gl_shell_logfile
 ) inherits gitlab::params {
 
   vcsrepo{'gitlab-shell':

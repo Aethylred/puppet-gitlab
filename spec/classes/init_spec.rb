@@ -20,10 +20,17 @@ describe 'gitlab', :type => :class do
         'shell'         => '/bin/bash'
       ) }
       it { should contain_class('gitlab::shell::install').with(
-        'user'        => 'git',
-        'user_home'   => '/home/git',
-        'repository'  => 'https://gitlab.com/gitlab-org/gitlab-shell.git',
-        'revision'    => 'v1.8.0'
+        'gitlab_url'        => 'http://localhost/',
+        'user'              => 'git',
+        'user_home'         => '/home/git',
+        'repository'        => 'https://gitlab.com/gitlab-org/gitlab-shell.git',
+        'revision'          => 'v1.8.0',
+        'repository_dir'    => '/home/git/repositories',
+        'auth_file'         => '/home/git/.ssh/authorized_keys',
+        'selfsigned_certs'  => true,
+        'audit_usernames'   => nil,
+        'log_level'         => 'INFO',
+        'gl_shell_logfile'  => nil
       ) }
       it { should contain_class('gitlab::db::postgresql').with(
         'db_user'             => 'git',
@@ -62,20 +69,32 @@ describe 'gitlab', :type => :class do
         'home'  => '/path/to/home'
       ) }
       it { should contain_class('gitlab::shell::install').with(
-        'user'      => 'nobody',
-        'user_home' => '/path/to/home'
+        'user'            => 'nobody',
+        'user_home'       => '/path/to/home',
+        'repository_dir'  => '/path/to/home/repositories',
+        'auth_file'       => '/path/to/home/.ssh/authorized_keys'
       ) }
     end
-    describe 'when given a gitlab shell repository URL and revision' do
+    describe 'when given parameters to pass through to gitlab shell' do
       let :params do
         {
-          :gitlab_shell_repo => 'https://git.example.org/repo.git',
-          :gitlab_shell_rev  => 'test'
+          :gitlab_url         => 'http://gitlab.example.org/',
+          :gitlab_shell_repo  => 'https://git.example.org/repo.git',
+          :gitlab_shell_rev   => 'test',
+          :selfsigned_certs   => false,
+          :audit_usernames    => true,
+          :log_level          => 'WARN',
+          :gl_shell_logfile   => '/path/to/log',
         }
       end
       it { should contain_class('gitlab::shell::install').with(
-        'repository'  => 'https://git.example.org/repo.git',
-        'revision'    => 'test'
+        'gitlab_url'        => 'http://gitlab.example.org/',
+        'repository'        => 'https://git.example.org/repo.git',
+        'revision'          => 'test',
+        'selfsigned_certs'  => false,
+        'audit_usernames'   => true,
+        'log_level'         => 'WARN',
+        'gl_shell_logfile'  => '/path/to/log'
       ) }
     end
     describe 'when given database configuration details' do
