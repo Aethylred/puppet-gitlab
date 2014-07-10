@@ -28,26 +28,59 @@
 
 # [Remember: No empty lines between comments and class definition]
 class gitlab (
-  $gitlab_url           = 'http://localhost/',
-  $user                 = $::gitlab::params::user,
-  $user_home            = $::gitlab::params::user_home,
-  $install_gl_shell     = true,
-  $gitlab_shell_repo    = $::gitlab::params::gitlab_shell_repo,
-  $gitlab_shell_rev     = $::gitlab::params::gitlab_shell_rev,
-  $manage_db            = true,
-  $db_user              = $::gitlab::params::user,
-  $db_name              = $::gitlab::params::db_name,
-  $db_user_password     = 'veryveryunsafe',
-  $db_user_passwd_hash  = undef,
-  $servername           = $::fqdn,
-  $selfsigned_certs     = true,
-  $audit_usernames      = undef,
-  $log_level            = 'INFO',
-  $gl_shell_logfile     = undef,
-  $gitlab_app_dir       = undef,
-  $gitlab_app_repo      = $::gitlab::params::gitlab_app_repo,
-  $gitlab_app_rev       = $::gitlab::params::gitlab_app_rev
+  $gitlab_url             = 'http://localhost/',
+  $relative_url_root      = '/gitlab',
+  $port                   = '80',
+  $enable_https           = false,
+  $email_address          = undef,
+  $user                   = $::gitlab::params::user,
+  $user_home              = $::gitlab::params::user_home,
+  $install_gl_shell       = true,
+  $gitlab_shell_repo      = $::gitlab::params::gitlab_shell_repo,
+  $gitlab_shell_rev       = $::gitlab::params::gitlab_shell_rev,
+  $manage_db              = true,
+  $db_user                = $::gitlab::params::user,
+  $db_name                = $::gitlab::params::db_name,
+  $db_user_password       = 'veryveryunsafe',
+  $db_user_passwd_hash    = undef,
+  $servername             = $::fqdn,
+  $selfsigned_certs       = true,
+  $audit_usernames        = false,
+  $log_level              = 'INFO',
+  $gl_shell_logfile       = undef,
+  $gitlab_app_dir         = undef,
+  $gitlab_app_repo        = $::gitlab::params::gitlab_app_repo,
+  $gitlab_app_rev         = $::gitlab::params::gitlab_app_rev,
+  $default_project_limit  = 10,
+  $allow_group_creation   = true,
+  $allow_name_change      = true,
+  $default_theme_id       = 2,
+  $project_issues         = true,
+  $project_merge_requests = true,
+  $project_wiki           = true,
+  $project_snippets       = false,
+  $project_visibility     = 'private',
+  $enable_gravatar        = true,
+  $ssh_port               = undef
 ) inherits gitlab::params {
+
+  validate_bool($install_gl_shell, $manage_db, $enable_https, $selfsigned_certs, $audit_usernames)
+  validate_bool($allow_name_change, $allow_group_creation, $enable_gravatar)
+  validate_bool($project_snippets, $project_wiki, $project_issues)
+  validate_re($project_visibility, ['^private$', '^public$', '^internal$'])
+
+  $repository_dir = "${user_home}/repositories"
+  $auth_file      = "${user_home}/.ssh/authorized_keys"
+  if $gitlab_app_dir {
+    $app_dir = $gitlab_app_dir
+  } else {
+    $app_dir = "${user_home}/gitlab"
+  }
+  if $email_address {
+    $real_email = $email_address
+  } else {
+    $real_email = "${user}@${servername}"
+  }
 
   user{'gitlab':
     ensure        => present,
@@ -64,14 +97,6 @@ class gitlab (
     path    => $user_home,
     owner   => $user,
     recurse => true,
-  }
-
-  $repository_dir = "${user_home}/repositories"
-  $auth_file      = "${user_home}/.ssh/authorized_keys"
-  if $gitlab_app_dir {
-    $app_dir = $gitlab_app_dir
-  } else {
-    $app_dir = "${user_home}/gitlab"
   }
 
   file{'gitlab_repostiories_dir':
@@ -114,17 +139,22 @@ class gitlab (
       db_user_passwd_hash => $db_user_passwd_hash,
       gitlab_server       => $servername,
       db_host             => $servername,
-      before              => Anchor['pre-gitlab-install'],
     }
   }
-
-  anchor{'pre-gitlab-install': }
 
   class{'gitlab::install':
     app_dir     => $app_dir,
     repository  => $gitlab_app_repo,
     revision    => $gitlab_app_rev,
     user        => $user,
-    require     => Anchor['pre-gitlab-install'],
+  }
+
+  file{'gitlab_app_config':
+    ensure  => 'file',
+    path    => "${app_dir}/config/gitlab.yml",
+    owner   => $user,
+    group   => $user,
+    content => template('gitlab/app/gitlab.yml.erb'),
+    require => Class['gitlab::install'],
   }
 }

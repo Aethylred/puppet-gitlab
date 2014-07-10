@@ -27,7 +27,7 @@ class gitlab::shell::install (
     path    => "${user_home}/gitlab-shell/config.yml",
     owner   => $user,
     group   => $user,
-    content => template('gitlab/gitlab-shell-config.yml.erb'),
+    content => template('gitlab/shell/config.yml.erb'),
     require => Vcsrepo['gitlab-shell'],
   }
 

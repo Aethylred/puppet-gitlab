@@ -28,7 +28,7 @@ describe 'gitlab', :type => :class do
         'repository_dir'    => '/home/git/repositories',
         'auth_file'         => '/home/git/.ssh/authorized_keys',
         'selfsigned_certs'  => true,
-        'audit_usernames'   => nil,
+        'audit_usernames'   => false,
         'log_level'         => 'INFO',
         'gl_shell_logfile'  => nil
       ) }
@@ -44,8 +44,77 @@ describe 'gitlab', :type => :class do
         'app_dir'     => '/home/git/gitlab',
         'repository'  => 'https://gitlab.com/gitlab-org/gitlab-ce.git',
         'revision'    => '7-0-stable',
-        'user'        => 'git',
-        'require'     => 'Anchor[pre-gitlab-install]'
+        'user'        => 'git'
+      ) }
+      it { should contain_file('gitlab_app_config').with(
+        'ensure'  => 'file',
+        'path'    => '/home/git/gitlab/config/gitlab.yml',
+        'owner'   => 'git',
+        'group'   => 'git',
+        'require' => 'Class[Gitlab::Install]'
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^# This file is managed by Puppet, changes may be overwritten.$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    host: test.example.org$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    port: 80$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    https: false$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    relative_url_root: /gitlab$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    user: git$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    email_from: git@test.example.org$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    default_projects_limit: 10$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    default_can_create_group: true$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    username_changing_enabled: true$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    default_theme: 2 # default: 2$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    default_projects_features:$\s^      issues: true$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^      merge_requests: true$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^      wiki: true$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^      snippets: false$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^      visibility_level: "private"$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^  gravatar:$\s^    enabled: true$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^  gitlab_shell:$\s^    path: /home/git/gitlab-shell/$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    repos_path: /home/git/repositories$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    hooks_path: /home/git/gitlab-shell/hooks/$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    # ssh_port: 22$}
       ) }
     end
     describe 'when not managing the gitlab shell install' do
@@ -84,6 +153,15 @@ describe 'gitlab', :type => :class do
       it { should contain_class('gitlab::install').with(
         'user'    => 'nobody',
         'app_dir' => '/path/to/home/gitlab'
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^  gitlab_shell:$\s^    path: /path/to/home/gitlab-shell/$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    repos_path: /path/to/home/repositories$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    hooks_path: /path/to/home/gitlab-shell/hooks/$}
       ) }
     end
     describe 'when given parameters to pass through to gitlab shell' do
@@ -139,6 +217,103 @@ describe 'gitlab', :type => :class do
         'app_dir'     => '/path/to/app',
         'repository'  => 'https://git.example.org/repo.git',
         'revision'    => 'test'
+      ) }
+    end
+    describe 'when configuring the application server' do
+      let :params do
+        {
+          :servername         => 'git.somewhere.org',
+          :port               => '8080',
+          :enable_https       => true,
+          :relative_url_root  => '/',
+          :email_address      => 'admin@somewhere.org',
+        }
+      end
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    host: git.somewhere.org$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    port: 8080$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    https: true$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    relative_url_root: /$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    email_from: admin@somewhere.org$}
+      ) }
+    end
+    describe 'when configuring user defaults' do
+      let :params do
+        {
+          :default_project_limit  => '25',
+          :allow_group_creation   => false,
+          :allow_name_change      => false,
+          :default_theme_id       => '3',
+        }
+      end
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    default_projects_limit: 25$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    default_can_create_group: false$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    username_changing_enabled: false$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    default_theme: 3 # default: 2$}
+      ) }
+    end
+    describe 'when configuring project defaults' do
+      let :params do
+        {
+          :project_issues         => false,
+          :project_merge_requests => false,
+          :project_wiki           => false,
+          :project_snippets       => true,
+          :project_visibility     => 'public',
+        }
+      end
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    default_projects_features:$\s^      issues: false$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^      merge_requests: false$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^      wiki: false$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^      snippets: true$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^      visibility_level: "public"$}
+      ) }
+    end
+    describe 'when disabling gravatar' do
+      let :params do
+        {
+          :enable_gravatar => false,
+        }
+      end
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^  gravatar:$\s^    enabled: false$}
+      ) }
+    end
+    describe 'when setting a custom SSH port' do
+      let :params do
+        {
+          :ssh_port => '2222',
+        }
+      end
+      it { should contain_file('gitlab_app_config').without_content(
+        %r{^    # ssh_port: 22$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    ssh_port: 2222$}
       ) }
     end
   end

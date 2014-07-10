@@ -21,7 +21,7 @@ describe 'gitlab::db::postgresql', :type => :class do
         it { should contain_postgresql__server__database('gitlab').with(
           'dbname'    => 'gitlab',
           'owner'     => 'git',
-          'encoding'  => 'UTF8'
+          'encoding'  => 'unicode'
         ) }
         it { should contain_postgresql__server__database_grant('gitlab_db_grant').with(
           'db'        => 'gitlab',

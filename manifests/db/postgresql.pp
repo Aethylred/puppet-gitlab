@@ -19,7 +19,7 @@ class gitlab::db::postgresql (
 
   postgresql::server::database{$db_name:
     owner     => $db_user,
-    encoding  => 'UTF8',
+    encoding  => 'unicode',
   }
 
   postgresql::server::database_grant{'gitlab_db_grant':

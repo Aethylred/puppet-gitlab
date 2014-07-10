@@ -12,13 +12,17 @@ These are good implementations, but install GitLab on Ngnix, which is not what's
 * https://github.com/spuder/puppet-gitlab
 * https://github.com/lboynton/puppet-gitlab
 
-GitLab installation references
+##GitLab installation references
 * https://gitlab.com/gitlab-org/gitlab-recipes/tree/master/web-server/apache
 * https://gitlab.com/gitlab-org/cookbook-gitlab/tree/master
 * http://k-d-w.org/node/94
 * https://www.digitalocean.com/community/articles/how-to-set-up-gitlab-as-your-very-own-private-github-clone
 * https://shanetully.com/2012/08/running-gitlab-from-a-subdirectory-on-apache/
 * https://github.com/gitlabhq/gitlabhq/blob/master/doc/install/installation.md
+
+## Using Shibboleth
+* https://groups.google.com/forum/#!msg/gitlabhq/BAhpzoW9KQ8/R62OvUL04KQJ
+* https://github.com/toyokazu/omniauth-shibboleth
 
 
 # Attribution
