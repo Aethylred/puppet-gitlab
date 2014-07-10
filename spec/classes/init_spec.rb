@@ -24,7 +24,7 @@ describe 'gitlab', :type => :class do
         'user'              => 'git',
         'user_home'         => '/home/git',
         'repository'        => 'https://gitlab.com/gitlab-org/gitlab-shell.git',
-        'revision'          => 'v1.8.0',
+        'revision'          => 'v1.9.6',
         'repository_dir'    => '/home/git/repositories',
         'auth_file'         => '/home/git/.ssh/authorized_keys',
         'selfsigned_certs'  => true,
@@ -40,6 +40,13 @@ describe 'gitlab', :type => :class do
         'gitlab_server'       => 'test.example.org',
         'db_host'             => 'test.example.org'
       )}
+      it { should contain_class('gitlab::install').with(
+        'app_dir'     => '/home/git/gitlab',
+        'repository'  => 'https://gitlab.com/gitlab-org/gitlab-ce.git',
+        'revision'    => '7-0-stable',
+        'user'        => 'git',
+        'require'     => 'Anchor[pre-gitlab-install]'
+      ) }
     end
     describe 'when not managing the gitlab shell install' do
       let :params do
@@ -73,6 +80,10 @@ describe 'gitlab', :type => :class do
         'user_home'       => '/path/to/home',
         'repository_dir'  => '/path/to/home/repositories',
         'auth_file'       => '/path/to/home/.ssh/authorized_keys'
+      ) }
+      it { should contain_class('gitlab::install').with(
+        'user'    => 'nobody',
+        'app_dir' => '/path/to/home/gitlab'
       ) }
     end
     describe 'when given parameters to pass through to gitlab shell' do
@@ -116,7 +127,20 @@ describe 'gitlab', :type => :class do
         'db_host'             => 'gitlab.example.com'
       )}
     end
-
+    describe 'when given parameters to pass through to gitlab application install' do
+      let :params do
+        {
+          :gitlab_app_repo  => 'https://git.example.org/repo.git',
+          :gitlab_app_rev   => 'test',
+          :gitlab_app_dir   => '/path/to/app',
+        }
+      end
+      it { should contain_class('gitlab::install').with(
+        'app_dir'     => '/path/to/app',
+        'repository'  => 'https://git.example.org/repo.git',
+        'revision'    => 'test'
+      ) }
+    end
   end
 
   context 'on a RedHat OS' do

@@ -43,7 +43,10 @@ class gitlab (
   $selfsigned_certs     = true,
   $audit_usernames      = undef,
   $log_level            = 'INFO',
-  $gl_shell_logfile     = undef
+  $gl_shell_logfile     = undef,
+  $gitlab_app_dir       = undef,
+  $gitlab_app_repo      = $::gitlab::params::gitlab_app_repo,
+  $gitlab_app_rev       = $::gitlab::params::gitlab_app_rev
 ) inherits gitlab::params {
 
   user{'gitlab':
@@ -65,6 +68,11 @@ class gitlab (
 
   $repository_dir = "${user_home}/repositories"
   $auth_file      = "${user_home}/.ssh/authorized_keys"
+  if $gitlab_app_dir {
+    $app_dir = $gitlab_app_dir
+  } else {
+    $app_dir = "${user_home}/gitlab"
+  }
 
   file{'gitlab_repostiories_dir':
     ensure  => 'directory',
@@ -93,6 +101,7 @@ class gitlab (
       audit_usernames   => $audit_usernames,
       log_level         => $log_level,
       gl_shell_logfile  => $gl_shell_logfile,
+      before            => Anchor['pre-gitlab-install'],
     }
   }
 
@@ -105,8 +114,17 @@ class gitlab (
       db_user_passwd_hash => $db_user_passwd_hash,
       gitlab_server       => $servername,
       db_host             => $servername,
+      before              => Anchor['pre-gitlab-install'],
     }
   }
 
+  anchor{'pre-gitlab-install': }
 
+  class{'gitlab::install':
+    app_dir     => $app_dir,
+    repository  => $gitlab_app_repo,
+    revision    => $gitlab_app_rev,
+    user        => $user,
+    require     => Anchor['pre-gitlab-install'],
+  }
 }

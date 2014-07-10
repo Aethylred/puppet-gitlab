@@ -13,8 +13,8 @@ These are good implementations, but install GitLab on Ngnix, which is not what's
 * https://github.com/lboynton/puppet-gitlab
 
 GitLab installation references
+* https://gitlab.com/gitlab-org/gitlab-recipes/tree/master/web-server/apache
 * https://gitlab.com/gitlab-org/cookbook-gitlab/tree/master
-* https://github.com/gitlabhq/gitlab-recipes/tree/master/web-server/apache
 * http://k-d-w.org/node/94
 * https://www.digitalocean.com/community/articles/how-to-set-up-gitlab-as-your-very-own-private-github-clone
 * https://shanetully.com/2012/08/running-gitlab-from-a-subdirectory-on-apache/

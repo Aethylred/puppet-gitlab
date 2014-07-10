@@ -15,6 +15,7 @@ class{'ruby':
 }
 
 include postgresql::server
+include postgresql::lib::devel
 
 class{'gitlab':
   require  => [Class['ruby','git']]
