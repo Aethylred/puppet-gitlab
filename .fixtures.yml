@@ -15,5 +15,12 @@ fixtures:
     postgresql:
       repo: 'puppetlabs-postgresql'
       ref:  '3.3.3'
+    git:
+      repo: 'Aethylred-git'
+      ref:  '0.1.2'
+  repositories:
+    ruby:
+      repo: 'git://github.com/Aethylred/puppetlabs-ruby.git'
+      ref:  'origin/rakebundle'
   symlinks:
     gitlab: "#{source_dir}"

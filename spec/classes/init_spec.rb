@@ -19,6 +19,10 @@ describe 'gitlab', :type => :class do
         'managehome'    => true,
         'shell'         => '/bin/bash'
       ) }
+      it { should contain_git__user('git').with(
+        'user_name'   => 'GitLab',
+        'user_email'  => 'git@test.example.org'
+      ) }
       it { should contain_class('gitlab::shell::install').with(
         'gitlab_url'        => 'http://localhost/',
         'user'              => 'git',
@@ -59,6 +63,12 @@ describe 'gitlab', :type => :class do
         'owner'   => 'git',
         'group'   => 'git',
         'require' => 'Class[Gitlab::Install]'
+      ) }
+      it { should contain_ruby__bundle('gitlab_install').with(
+        'command' => 'install',
+        'option'  => '--deployment',
+        'cwd'     => '/home/git/gitlab',
+        'user'    => 'git'
       ) }
       it { should contain_file('gitlab_app_config').with_content(
         %r{^# This file is managed by Puppet, changes may be overwritten.$}
@@ -166,6 +176,9 @@ describe 'gitlab', :type => :class do
         'name'  => 'nobody',
         'home'  => '/path/to/home'
       ) }
+      it { should contain_git__user('nobody').with(
+        'user_email'  => 'nobody@test.example.org'
+      ) }
       it { should contain_class('gitlab::shell::install').with(
         'user'            => 'nobody',
         'user_home'       => '/path/to/home',
@@ -185,6 +198,10 @@ describe 'gitlab', :type => :class do
         'path'    => '/path/to/home/gitlab/config/database.yml',
         'owner'   => 'nobody',
         'group'   => 'nobody'
+      ) }
+      it { should contain_ruby__bundle('gitlab_install').with(
+        'cwd'     => '/path/to/home/gitlab',
+        'user'    => 'nobody'
       ) }
       it { should contain_file('gitlab_app_config').with_content(
         %r{^  gitlab_shell:$\s^    path: /path/to/home/gitlab-shell/$}
@@ -284,6 +301,9 @@ describe 'gitlab', :type => :class do
           :email_address      => 'admin@somewhere.org',
         }
       end
+      it { should contain_git__user('git').with(
+        'user_email'  => 'admin@somewhere.org'
+      ) }
       it { should contain_file('gitlab_app_config').with_content(
         %r{^    host: git.somewhere.org$}
       ) }

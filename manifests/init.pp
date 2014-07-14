@@ -94,6 +94,11 @@ class gitlab (
     shell         => '/bin/bash',
   }
 
+  git::user{$user:
+    user_name   => 'GitLab',
+    user_email  => $real_email,
+  }
+
   file{'gitlab_home':
     ensure  => 'directory',
     path    => $user_home,
@@ -167,5 +172,12 @@ class gitlab (
     group   => $user,
     content => template('gitlab/app/database.yml.erb'),
     require => Class['gitlab::install'],
+  }
+
+  ruby::bundle{'gitlab_install':
+    command => 'install',
+    option  => '--deployment',
+    cwd     => $app_dir,
+    user    => $user,
   }
 }
