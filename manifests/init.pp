@@ -41,6 +41,8 @@ class gitlab (
   $manage_db              = true,
   $db_user                = $::gitlab::params::user,
   $db_name                = $::gitlab::params::db_name,
+  $db_host                = undef,
+  $db_port                = undef,
   $db_user_password       = 'veryveryunsafe',
   $db_user_passwd_hash    = undef,
   $servername             = $::fqdn,
@@ -155,6 +157,15 @@ class gitlab (
     owner   => $user,
     group   => $user,
     content => template('gitlab/app/gitlab.yml.erb'),
+    require => Class['gitlab::install'],
+  }
+
+  file{'gitlab_db_config':
+    ensure  => 'file',
+    path    => "${app_dir}/config/database.yml",
+    owner   => $user,
+    group   => $user,
+    content => template('gitlab/app/database.yml.erb'),
     require => Class['gitlab::install'],
   }
 }

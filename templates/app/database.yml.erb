@@ -5,12 +5,20 @@
 production:
   adapter: postgresql
   encoding: unicode
-  database: gitlabhq_production
+  database: <%= @db_name %>
   pool: 10
-  # username: git
-  # password:
+  username: <%= @db_user %>
+  password: <%= @db_user_password %>
+  <%- if @db_host -%>
+  host: <%= @db_host %>
+  <%- else -%>
   # host: localhost
-  # port: 5432 
+  <%- end -%>
+  <%- if @db_port -%>
+  port: <%= @db_port %>
+  <%- else -%>
+  # port: 5432
+  <%- end -%>
 
 #
 # Development specific

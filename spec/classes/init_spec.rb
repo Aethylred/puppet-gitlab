@@ -53,6 +53,13 @@ describe 'gitlab', :type => :class do
         'group'   => 'git',
         'require' => 'Class[Gitlab::Install]'
       ) }
+      it { should contain_file('gitlab_db_config').with(
+        'ensure'  => 'file',
+        'path'    => '/home/git/gitlab/config/database.yml',
+        'owner'   => 'git',
+        'group'   => 'git',
+        'require' => 'Class[Gitlab::Install]'
+      ) }
       it { should contain_file('gitlab_app_config').with_content(
         %r{^# This file is managed by Puppet, changes may be overwritten.$}
       ) }
@@ -116,6 +123,21 @@ describe 'gitlab', :type => :class do
       it { should contain_file('gitlab_app_config').with_content(
         %r{^    # ssh_port: 22$}
       ) }
+      it { should contain_file('gitlab_db_config').with_content(
+        %r{^  database: gitlab$}
+      ) }
+      it { should contain_file('gitlab_db_config').with_content(
+        %r{^  username: git$}
+      ) }
+      it { should contain_file('gitlab_db_config').with_content(
+        %r{^  password: veryveryunsafe$}
+      ) }
+      it { should contain_file('gitlab_db_config').with_content(
+        %r{^  # host: localhost$}
+      ) }
+      it { should contain_file('gitlab_db_config').with_content(
+        %r{^  # port: 5432$}
+      ) }
     end
     describe 'when not managing the gitlab shell install' do
       let :params do
@@ -154,6 +176,16 @@ describe 'gitlab', :type => :class do
         'user'    => 'nobody',
         'app_dir' => '/path/to/home/gitlab'
       ) }
+      it { should contain_file('gitlab_app_config').with(
+        'path'    => '/path/to/home/gitlab/config/gitlab.yml',
+        'owner'   => 'nobody',
+        'group'   => 'nobody'
+      ) }
+      it { should contain_file('gitlab_db_config').with(
+        'path'    => '/path/to/home/gitlab/config/database.yml',
+        'owner'   => 'nobody',
+        'group'   => 'nobody'
+      ) }
       it { should contain_file('gitlab_app_config').with_content(
         %r{^  gitlab_shell:$\s^    path: /path/to/home/gitlab-shell/$}
       ) }
@@ -191,6 +223,8 @@ describe 'gitlab', :type => :class do
         {
           :db_user              => 'nobody',
           :db_name              => 'gitlab_test',
+          :db_host              => 'db.example.org',
+          :db_port              => '4466',
           :db_user_password     => 'stillinsecure',
           :db_user_passwd_hash  => 'this is not really a hash',
           :servername           => 'gitlab.example.com',
@@ -204,6 +238,27 @@ describe 'gitlab', :type => :class do
         'gitlab_server'       => 'gitlab.example.com',
         'db_host'             => 'gitlab.example.com'
       )}
+      it { should contain_file('gitlab_db_config').with_content(
+        %r{^  database: gitlab_test$}
+      ) }
+      it { should contain_file('gitlab_db_config').with_content(
+        %r{^  username: nobody$}
+      ) }
+      it { should contain_file('gitlab_db_config').with_content(
+        %r{^  password: stillinsecure$}
+      ) }
+      it { should contain_file('gitlab_db_config').with_content(
+        %r{^  host: db.example.org$}
+      ) }
+      it { should contain_file('gitlab_db_config').without_content(
+        %r{^  # host: localhost$}
+      ) }
+      it { should contain_file('gitlab_db_config').with_content(
+        %r{^  port: 4466$}
+      ) }
+      it { should contain_file('gitlab_db_config').without_content(
+        %r{^  # port: 5432$}
+      ) }
     end
     describe 'when given parameters to pass through to gitlab application install' do
       let :params do
