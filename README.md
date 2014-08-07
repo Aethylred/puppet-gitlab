@@ -2,6 +2,10 @@
 
 This Puppet module installs, manages and configures the [GitLab](http://gitlab.org/) open source code repository. This module configures GitLab to run on [Apache](http://httpd.apache.org/) and [Passenger](https://www.phusionpassenger.com/) using the [Puppetlabs Apache Module](https://github.com/puppetlabs/puppetlabs-apache). Apache is used instead of [Ngnix](http://nginx.org/) as there are some authorisation models that have already been solved for Apache and not yet resolved for Ngnix.
 
+# Supported Distributions
+
+As GitLab requires Ruby 2.0.0 this module has been developed to work on Ubuntu 14.04LTS which uses this as it's natural Ruby version. Work has been done to try and make it work with Ubuntu 12.04LTS, but runs into issues getting the gems installed correctly.
+
 # References
 
 ## Other GitLab puppet modules

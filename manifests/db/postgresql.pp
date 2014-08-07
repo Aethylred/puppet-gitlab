@@ -20,12 +20,14 @@ class gitlab::db::postgresql (
   postgresql::server::database{$db_name:
     owner     => $db_user,
     encoding  => 'unicode',
+    require   => Postgresql::Server::Role[$db_user],
   }
 
   postgresql::server::database_grant{'gitlab_db_grant':
     db        => $db_name,
     role      => $db_user,
     privilege => 'ALL',
+    require   => Postgresql::Server::Database[$db_name]
   }
 
 }

@@ -4,7 +4,7 @@ class gitlab::params {
   $gitlab_shell_repo  = 'https://gitlab.com/gitlab-org/gitlab-shell.git'
   $gitlab_shell_rev   = 'v1.9.6'
   $gitlab_app_repo    = 'https://gitlab.com/gitlab-org/gitlab-ce.git'
-  $gitlab_app_rev     = '7-0-stable'
+  $gitlab_app_rev     = '7-1-stable'
   $db_name            = 'gitlab'
 
   case $::osfamily {

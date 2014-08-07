@@ -97,6 +97,7 @@ class gitlab (
   git::user{$user:
     user_name   => 'GitLab',
     user_email  => $real_email,
+    require     => User['gitlab'],
   }
 
   file{'gitlab_home':
@@ -133,7 +134,7 @@ class gitlab (
       audit_usernames   => $audit_usernames,
       log_level         => $log_level,
       gl_shell_logfile  => $gl_shell_logfile,
-      before            => Anchor['pre-gitlab-install'],
+      before            => Ruby::Bundle['gitlab_install'],
     }
   }
 
@@ -175,9 +176,25 @@ class gitlab (
   }
 
   ruby::bundle{'gitlab_install':
-    command => 'install',
-    option  => '--deployment',
-    cwd     => $app_dir,
-    user    => $user,
+    command     => 'install',
+    option      => '--deployment --path=vendor/bundle --without test development mysql aws',
+    environment => ["HOME=${user_home}"],
+    cwd         => $app_dir,
+    user        => $user,
+    # multicore   => '0',
+    timeout     => '600',
+    require     => [
+      File['gitlab_db_config','gitlab_app_config']
+    ],
+  }
+
+  ruby::rake{'gitlab_setup':
+    task        => 'gitlab:setup',
+    environment => ['force=yes',"HOME=${user_home}"],
+    bundle      => true,
+    refreshonly => true,
+    cwd         => $app_dir,
+    user        => $user,
+    subscribe   => Ruby::Bundle['gitlab_install'],
   }
 }
