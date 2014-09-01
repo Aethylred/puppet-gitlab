@@ -21,7 +21,7 @@ These are good implementations, but install GitLab on Ngnix, which is not what's
 * https://gitlab.com/gitlab-org/cookbook-gitlab/tree/master
 * http://k-d-w.org/node/94
 * https://www.digitalocean.com/community/articles/how-to-set-up-gitlab-as-your-very-own-private-github-clone
-* https://shanetully.com/2012/08/running-gitlab-from-a-subdirectory-on-apache/
+* https://shanetully.com/2012/08/23/running-gitlab-from-a-subdirectory-on-apache/
 * https://github.com/gitlabhq/gitlabhq/blob/master/doc/install/installation.md
 
 ## Using Shibboleth
@@ -53,7 +53,7 @@ This will require a copy of the original input files to `spec/fixtures/augeas` u
 
 # Gnu General Public License
 
-[![GPL3](http://www.gnu.org/graphics/gplv3-127x51.png)]](http://www.gnu.org/licenses)
+[![GPL3](http://www.gnu.org/graphics/gplv3-127x51.png)](http://www.gnu.org/licenses)
 
 This file is part of the gitlab Puppet module.
 

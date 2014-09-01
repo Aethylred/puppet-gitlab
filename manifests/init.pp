@@ -166,6 +166,15 @@ class gitlab (
     require => Class['gitlab::install'],
   }
 
+  file{'gitlab_app_rb_config':
+    ensure  => 'file',
+    path    => "${app_dir}/config/application.rb",
+    owner   => $user,
+    group   => $user,
+    content => template('gitlab/app/application.rb.erb'),
+    require => Class['gitlab::install'],
+  }
+
   file{'gitlab_db_config':
     ensure  => 'file',
     path    => "${app_dir}/config/database.yml",
