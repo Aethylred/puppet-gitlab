@@ -84,6 +84,8 @@ class gitlab (
     $real_email = "${user}@${servername}"
   }
 
+  $site_dir = "${app_dir}/public"
+
   user{'gitlab':
     ensure        => present,
     name          => $user,
@@ -104,6 +106,7 @@ class gitlab (
     ensure  => 'directory',
     path    => $user_home,
     owner   => $user,
+    group   => $user,
     recurse => true,
   }
 
@@ -111,6 +114,8 @@ class gitlab (
     ensure  => 'directory',
     path    => $repository_dir,
     owner   => $user,
+    group   => $user,
+    mode    => '2770',
     recurse => true,
   }
 
@@ -118,6 +123,7 @@ class gitlab (
     ensure  => 'file',
     path    => $auth_file,
     owner   => $user,
+    group   => $user,
     mode    => '0600',
   }
 
@@ -162,6 +168,7 @@ class gitlab (
     path    => "${app_dir}/config/gitlab.yml",
     owner   => $user,
     group   => $user,
+    mode    => '0640',
     content => template('gitlab/app/gitlab.yml.erb'),
     require => Class['gitlab::install'],
   }
@@ -171,6 +178,7 @@ class gitlab (
     path    => "${app_dir}/config/application.rb",
     owner   => $user,
     group   => $user,
+    mode    => '0640',
     content => template('gitlab/app/application.rb.erb'),
     require => Class['gitlab::install'],
   }
@@ -180,8 +188,25 @@ class gitlab (
     path    => "${app_dir}/config/database.yml",
     owner   => $user,
     group   => $user,
+    mode    => '0640',
     content => template('gitlab/app/database.yml.erb'),
     require => Class['gitlab::install'],
+  }
+
+  file{'gitlab_etc_default':
+    ensure  => 'file',
+    path    => '/etc/default/gitlab',
+    mode    => '0644',
+    content => template('gitlab/app/gitlab_default.erb'),
+    require => Class['gitlab::install'],
+  }
+
+  file{'gitlab_init_script':
+    ensure  => 'file',
+    path    => '/etc/init.d/gitlab',
+    mode    => '0744',
+    content => template('gitlab/app/gitlab_init.d.erb'),
+    require => File['gitlab_etc_default'],
   }
 
   ruby::bundle{'gitlab_install':
@@ -205,5 +230,38 @@ class gitlab (
     cwd         => $app_dir,
     user        => $user,
     subscribe   => Ruby::Bundle['gitlab_install'],
+  }
+
+  ruby::rake{'gitlab_precompile_assets':
+    task        => 'assets:precompile',
+    environment => ['force=yes',"HOME=${user_home}","RAILS_RELATIVE_URL_ROOT=${relative_url_root}"],
+    bundle      => true,
+    creates     => "${site_dir}/assets",
+    cwd         => $app_dir,
+    user        => $user,
+    require     => Ruby::Bundle['gitlab_install'],
+  }
+
+  apache::vhost{'gitlab':
+    docroot         => $site_dir,
+    docroot_owner   => $user,
+    docroot_group   => $user,
+    port            => '80',
+    directories     => [
+      { path      => "${site_dir}",
+        provider  => 'location',
+        allow     => 'from all',
+        options   => ['-MultiViews'],
+      }
+    ],
+    error_documents => [
+      {'error_code' => '404', 'document' => '/404.html'},
+      {'error_code' => '422', 'document' => '/422.html'},
+      {'error_code' => '500', 'document' => '/500.html'},
+      {'error_code' => '503', 'document' => '/deploy.html'}
+    ],
+    error_log_file  => "gitlab.${fqdn}.log",
+    custom_fragment => "  CustomLog /var/log/apache2/gitlab.example.com_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab.example.com_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab.example.com.log combined",
+    require         => Ruby::Rake['gitlab_precompile_assets'],
   }
 }

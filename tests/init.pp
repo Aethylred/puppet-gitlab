@@ -4,7 +4,10 @@ package{'libicu-dev':
   ensure => 'present',
 }
 
-include apache
+class{'apache':
+  default_vhost => false,
+  log_formats     => { common_forwarded => '%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b'},
+}
 include apache::mod::passenger
 include redis
 
@@ -20,7 +23,8 @@ include postgresql::server
 include postgresql::lib::devel
 
 class{'gitlab':
-  require  => [
+  relative_url_root => '/',
+  require           => [
     Class[
       'ruby',
       'git',
