@@ -29,7 +29,7 @@
 # [Remember: No empty lines between comments and class definition]
 class gitlab (
   $gitlab_url             = 'http://localhost/',
-  $relative_url_root      = '/gitlab',
+  $relative_url_root      = '/',
   $port                   = '80',
   $enable_https           = false,
   $email_address          = undef,
@@ -204,6 +204,8 @@ class gitlab (
   file{'gitlab_init_script':
     ensure  => 'file',
     path    => '/etc/init.d/gitlab',
+    owner   => $user,
+    group   => $user,
     mode    => '0744',
     content => template('gitlab/app/gitlab_init.d.erb'),
     require => File['gitlab_etc_default'],
@@ -234,12 +236,20 @@ class gitlab (
 
   ruby::rake{'gitlab_precompile_assets':
     task        => 'assets:precompile',
-    environment => ['force=yes',"HOME=${user_home}","RAILS_RELATIVE_URL_ROOT=${relative_url_root}"],
+    environment => ['force=yes',"HOME=${user_home}"],
     bundle      => true,
     creates     => "${site_dir}/assets",
     cwd         => $app_dir,
     user        => $user,
     require     => Ruby::Bundle['gitlab_install'],
+  }
+
+  service{'gitlab':
+    ensure      => 'running',
+    enable      => true,
+    hasstatus   => true,
+    hasrestart  => true,
+    require   => File['gitlab_init_script'],
   }
 
   apache::vhost{'gitlab':
@@ -262,6 +272,9 @@ class gitlab (
     ],
     error_log_file  => "gitlab.${fqdn}.log",
     custom_fragment => "  CustomLog /var/log/apache2/gitlab.example.com_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab.example.com_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab.example.com.log combined",
-    require         => Ruby::Rake['gitlab_precompile_assets'],
+    require         => [
+      Ruby::Rake['gitlab_precompile_assets'],
+      Service['gitlab'],
+    ],
   }
 }

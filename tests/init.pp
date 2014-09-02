@@ -23,7 +23,6 @@ include postgresql::server
 include postgresql::lib::devel
 
 class{'gitlab':
-  relative_url_root => '/',
   require           => [
     Class[
       'ruby',
