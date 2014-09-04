@@ -249,7 +249,7 @@ class gitlab (
     enable      => true,
     hasstatus   => true,
     hasrestart  => true,
-    require   => File['gitlab_init_script'],
+    require     => File['gitlab_init_script'],
   }
 
   apache::vhost{'gitlab':
@@ -258,7 +258,7 @@ class gitlab (
     docroot_group   => $user,
     port            => '80',
     directories     => [
-      { path      => "${site_dir}",
+      { path      => $site_dir,
         provider  => 'location',
         allow     => 'from all',
         options   => ['-MultiViews'],

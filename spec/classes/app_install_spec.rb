@@ -3,14 +3,15 @@ describe 'gitlab::install', :type => :class do
   context 'on a Debian OS' do
     let :facts do
       {
-        :osfamily       => 'Debian',
-        :concat_basedir => '/dne',
-        :fqdn           => 'test.example.org',
+        :osfamily               => 'Debian',
+        :operatingsystemrelease => '6',
+        :concat_basedir         => '/dne',
+        :fqdn                   => 'test.example.org',
       }
     end
     describe 'with default gitlab (disable shell install so test can redeclare)' do
       let :pre_condition do
-        "include gitlab"
+        "include gitlab\ninclude apache"
       end
       describe 'with no parameters' do
         it { should contain_class('gitlab::params') }
@@ -20,7 +21,7 @@ describe 'gitlab::install', :type => :class do
           'provider'  => 'git',
           'user'      => 'git',
           'source'    => 'https://gitlab.com/gitlab-org/gitlab-ce.git',
-          'revision'  => '7-0-stable',
+          'revision'  => '7-1-stable',
           'require'   => 'User[gitlab]'
         ) }
         it { should contain_file('gitlab_app_dir').with(
@@ -37,8 +38,10 @@ describe 'gitlab::install', :type => :class do
   context 'on a RedHat OS' do
     let :facts do
       {
-        :osfamily       => 'RedHat',
-        :concat_basedir => '/dne',
+        :osfamily               => 'RedHat',
+        :operatingsystemrelease => '6',
+        :concat_basedir         => '/dne',
+        :fqdn                   => 'test.example.org',
       }
     end
     it do
@@ -51,8 +54,10 @@ describe 'gitlab::install', :type => :class do
   context 'on an Unknown OS' do
     let :facts do
       {
-        :osfamily       => 'Unknown',
-        :concat_basedir => '/dne',
+        :osfamily               => 'Unknown',
+        :operatingsystemrelease => '6',
+        :concat_basedir         => '/dne',
+        :fqdn                   => 'test.example.org',
       }
     end
     it do
