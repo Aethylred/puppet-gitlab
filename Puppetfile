@@ -1,4 +1,4 @@
-forge 'https://forge.puppetlabs.com'
+forge 'https://forgeapi.puppetlabs.com'
 
 mod 'puppetlabs/stdlib'
 mod 'puppetlabs/apt'
@@ -9,5 +9,5 @@ mod 'Aethylred/git'
 mod 'thomasvandoren/redis'
 
 mod 'puppetlabs/ruby',
-  :git => 'https://github.com/Aethylred/puppetlabs-ruby.git',
-  :ref => 'all_features'
+  :git => 'https://github.com/puppetlabs/puppetlabs-ruby.git',
+  :ref => 'master'

@@ -20,7 +20,7 @@ There is a complete install [manifest example in the tests directory](tests/init
 * [**puppetlabs/postgresql**](https://forge.puppetlabs.com/puppetlabs/postgresql)
 * [**Aethylred/git**](https://forge.puppetlabs.com/Aethylred/git)
 * [**thomasvandoren/redis**](https://forge.puppetlabs.com/thomasvandoren/redis)
-* **puppetlabs/ruby** this module relies on a [patched version of the PuppetLabs ruby module](https://github.com/Aethylred/puppetlabs-ruby/tree/all_features) that includes the `ruby::bundle` and `ruby::rake` resources. Check the supplied [Puppetfile](Puppetfile) that can be used by [librarian-puppet](https://github.com/rodjek/librarian-puppet) to install the modules.
+* [**puppetlabs/ruby**](https://github.com/puppetlabs/puppetlabs-ruby) this module relies on a patches that are currently only in the master branch of the GitHub repository and not the version published at the Puppet Forge.
 
 # Classes
 
@@ -71,12 +71,12 @@ This module provides a base `gitlab` class that will be used in most manifests. 
 
 This class sets up a postgres database for the GitLab application. It does not install postgresql, this should be declared beforehand.
 
-* *db_name*
-* *db_user*
-* *db_user_password*
-* *db_user_passwd_hash*
-* *gitlab_server*
-* *db_host*
+* *gitlab_server* used to grant the host running the GitLab application access to the database. The default is undefined, which does not create any access rights.
+* *db_user* sets the database user for the Gitlab application database. The default is `git`
+* *db_name* sets the database name for the GitLab application database. The default is `gitlab`
+* *db_host* sets the database host, the default is undefined which uses the localhost.
+* *db_user_password*  sets the password used by the database user to access the GitLab application database. The default is `veryveryunsafe`
+* *db_user_passwd_hash* if this is set, this hash is used as the password for the database user to access the GitLab application database. The default is undefined, which reverts to using the password set by *db_user_password*
 
 ## Private Classes
 
@@ -150,18 +150,6 @@ This module is derived from the [puppet-blank](https://github.com/Aethylred/pupp
 This module has been developed for the use with Open Source Puppet (Apache 2.0 license) for automating server & service deployment.
 
 * http://puppetlabs.com/puppet/puppet-open-source/
-
-## rspec-puppet-augeas
-
-This module includes the [Travis](https://travis-ci.org) configuration to use [`rspec-puppet-augeas`](https://github.com/domcleal/rspec-puppet-augeas) to test and verify changes made to files using the [`augeas` resource](http://docs.puppetlabs.com/references/latest/type.html#augeas) available in Puppet. Check the `rspec-puppet-augeas` [documentation](https://github.com/domcleal/rspec-puppet-augeas/blob/master/README.md) for usage.
-
-This will require a copy of the original input files to `spec/fixtures/augeas` using the same filesystem layout that the resource expects:
-
-    $ tree spec/fixtures/augeas/
-    spec/fixtures/augeas/
-    `-- etc
-        `-- ssh
-            `-- sshd_config
 
 # Gnu General Public License
 
