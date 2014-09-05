@@ -1,5 +1,6 @@
 class{'git': }
- 
+
+# required to meet dependencies for bundling the gems
 package{'libicu-dev':
   ensure => 'present',
 }
