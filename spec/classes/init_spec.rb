@@ -147,6 +147,8 @@ describe 'gitlab', :type => :class do
         'require'     => 'File[gitlab_init_script]'
       ) }
       it { should contain_apache__vhost('gitlab').with(
+        'servername'      => 'test.example.org',
+        'serveradmin'     => nil,
         'docroot'         => '/home/git/gitlab/public',
         'docroot_owner'   => 'git',
         'docroot_group'   => 'git',
@@ -165,7 +167,7 @@ describe 'gitlab', :type => :class do
           {'error_code' => '503', 'document' => '/deploy.html'}
         ],
         'error_log_file'  => 'gitlab.test.example.org.log',
-        'custom_fragment' => "  CustomLog /var/log/apache2/gitlab.example.com_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab.example.com_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab.example.com.log combined",
+        'custom_fragment' => "  CustomLog /var/log/apache2/gitlab_test.example.org_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab_test.example.org_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab_test.example.org.log combined",
         'require'         => ['Ruby::Rake[gitlab_precompile_assets]','Service[gitlab]']
       ) }
       # Verify contents of gitlab_app_config
@@ -483,12 +485,56 @@ describe 'gitlab', :type => :class do
           :servername         => 'git.somewhere.org',
           :port               => '8080',
           :enable_https       => true,
+          :redirect_http      => true,
           :relative_url_root  => '/',
           :email_address      => 'admin@somewhere.org',
+          :ssl_cert           => '/path/to/cert.crt',
+          :ssl_key            => '/path/to/key.pem',
+          :ssl_ca             => '/path/to/ca.crt',
         }
       end
       it { should contain_git__user('git').with(
         'user_email'  => 'admin@somewhere.org'
+      ) }
+      it { should contain_apache__vhost('gitlab_http_redirect').with(
+        'servername'      => 'git.somewhere.org',
+        'docroot'         => '/home/git/gitlab/public',
+        'serveradmin'     => 'admin@somewhere.org',
+        'port'            => '80',
+        'directories'     => {},
+        'rewrites'        => [
+          {'rewrite_cond'  => '%{HTTPS} !=on'},
+          {'rewrite_rule'  => '.* https://%{SERVER_NAME}%{REQUEST_URI} [NE,R,L]'}
+        ]
+      ) }
+      it { should contain_apache__vhost('gitlab').with(
+        'servername'      => 'git.somewhere.org',
+        'serveradmin'     => 'admin@somewhere.org',
+        'ssl'             => true,
+        'ssl_cipher'      => 'SSLv3:TLSv1:+HIGH:!SSLv2:!MD5:!MEDIUM:!LOW:!EXP:!ADH:!eNULL:!aNULL',
+        'ssl_cert'        => '/path/to/cert.crt',
+        'ssl_key'         => '/path/to/key.pem',
+        'ssl_ca'          => '/path/to/ca.crt',
+        'docroot'         => '/home/git/gitlab/public',
+        'docroot_owner'   => 'git',
+        'docroot_group'   => 'git',
+        'port'            => '8080',
+        'directories'     => [
+          { 'path'      => '/home/git/gitlab/public',
+            'provider'  => 'location',
+            'allow'     => 'from all',
+            'options'   => ['-MultiViews'],
+          }
+        ],
+        'error_documents' => [
+          {'error_code' => '404', 'document' => '/404.html'},
+          {'error_code' => '422', 'document' => '/422.html'},
+          {'error_code' => '500', 'document' => '/500.html'},
+          {'error_code' => '503', 'document' => '/deploy.html'}
+        ],
+        'error_log_file'  => 'gitlab.git.somewhere.org.log',
+        'custom_fragment' => "  CustomLog /var/log/apache2/gitlab_git.somewhere.org_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab_git.somewhere.org_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab_git.somewhere.org.log combined",
+        'require'         => ['Ruby::Rake[gitlab_precompile_assets]','Service[gitlab]']
       ) }
       it { should contain_file('gitlab_app_config').with_content(
         %r{^    host: git.somewhere.org$}

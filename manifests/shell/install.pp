@@ -1,3 +1,4 @@
+# installs and configures the GitLab shell
 class gitlab::shell::install (
   $gitlab_url       = $::gitlab::real_gitlab_url,
   $user             = $::gitlab::user,

@@ -30,8 +30,9 @@
 class gitlab (
   $gitlab_url             = undef,
   $relative_url_root      = undef,
-  $port                   = '80',
+  $port                   = undef,
   $enable_https           = false,
+  $redirect_http          = false,
   $email_address          = undef,
   $user                   = $::gitlab::params::user,
   $user_home              = $::gitlab::params::user_home,
@@ -63,7 +64,10 @@ class gitlab (
   $project_snippets       = false,
   $project_visibility     = 'private',
   $enable_gravatar        = true,
-  $ssh_port               = undef
+  $ssh_port               = undef,
+  $ssl_cert               = undef,
+  $ssl_key                = undef,
+  $ssl_ca                 = undef
 ) inherits gitlab::params {
 
   require redis
@@ -88,6 +92,17 @@ class gitlab (
 
   $site_dir = "${app_dir}/public"
 
+  if $port {
+    $real_port    = $port
+    $port_striing = ":${port}"
+  } elsif $enable_https {
+    $real_port    = '443'
+    $port_striing = ''
+  } else {
+    $real_port    = '80'
+    $port_striing = ''
+  }
+
   if $enable_https {
     $url_protocol = 'https://'
   } else {
@@ -97,9 +112,9 @@ class gitlab (
   if $gitlab_url {
     $real_gitlab_url = $gitlab_url
   } elsif $relative_url_root {
-    $real_gitlab_url = "${url_protocol}${servername}${relative_url_root}"
+    $real_gitlab_url = "${url_protocol}${servername}${port_string}${relative_url_root}"
   } else  {
-    $real_gitlab_url = "${url_protocol}${servername}/"
+    $real_gitlab_url = "${url_protocol}${servername}${port_string}/"
   }
 
   user{'gitlab':
@@ -278,29 +293,78 @@ class gitlab (
     require     => File['gitlab_init_script'],
   }
 
-  apache::vhost{'gitlab':
-    docroot         => $site_dir,
-    docroot_owner   => $user,
-    docroot_group   => $user,
-    port            => '80',
-    directories     => [
-      { path      => $site_dir,
-        provider  => 'location',
-        allow     => 'from all',
-        options   => ['-MultiViews'],
+  $vhost_error_docs = [
+    {'error_code' => '404', 'document' => '/404.html'},
+    {'error_code' => '422', 'document' => '/422.html'},
+    {'error_code' => '500', 'document' => '/500.html'},
+    {'error_code' => '503', 'document' => '/deploy.html'}
+  ]
+
+  $vhost_custom_fragment = "  CustomLog /var/log/apache2/gitlab_${servername}_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab_${servername}_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab_${servername}.log combined"
+
+  if $enable_https {
+    if $redirect_http {
+      apache::vhost{'gitlab_http_redirect':
+        servername      => $servername,
+        docroot         => $site_dir,
+        serveradmin     => $email_address,
+        port            => '80',
+        directories     => {},
+        rewrites        => [
+          {'rewrite_cond'  => '%{HTTPS} !=on'},
+          {'rewrite_rule'  => '.* https://%{SERVER_NAME}%{REQUEST_URI} [NE,R,L]'}
+        ],
       }
-    ],
-    error_documents => [
-      {'error_code' => '404', 'document' => '/404.html'},
-      {'error_code' => '422', 'document' => '/422.html'},
-      {'error_code' => '500', 'document' => '/500.html'},
-      {'error_code' => '503', 'document' => '/deploy.html'}
-    ],
-    error_log_file  => "gitlab.${fqdn}.log",
-    custom_fragment => "  CustomLog /var/log/apache2/gitlab.example.com_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab.example.com_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab.example.com.log combined",
-    require         => [
-      Ruby::Rake['gitlab_precompile_assets'],
-      Service['gitlab'],
-    ],
+    }
+    apache::vhost{'gitlab':
+      servername      => $servername,
+      serveradmin     => $email_address,
+      ssl             => true,
+      ssl_cipher      => 'SSLv3:TLSv1:+HIGH:!SSLv2:!MD5:!MEDIUM:!LOW:!EXP:!ADH:!eNULL:!aNULL',
+      ssl_cert        => $ssl_cert,
+      ssl_key         => $ssl_key,
+      ssl_ca          => $ssl_ca,
+      docroot         => $site_dir,
+      docroot_owner   => $user,
+      docroot_group   => $user,
+      port            => $real_port,
+      directories     => [
+        { path      => $site_dir,
+          provider  => 'location',
+          allow     => 'from all',
+          options   => ['-MultiViews'],
+        }
+      ],
+      error_documents => $vhost_error_docs,
+      error_log_file  => "gitlab.${servername}.log",
+      custom_fragment => $vhost_custom_fragment,
+      require         => [
+        Ruby::Rake['gitlab_precompile_assets'],
+        Service['gitlab'],
+      ],
+    }
+  } else {
+    apache::vhost{'gitlab':
+      servername      => $servername,
+      serveradmin     => $email_address,
+      docroot         => $site_dir,
+      docroot_owner   => $user,
+      docroot_group   => $user,
+      port            => $real_port,
+      directories     => [
+        { path      => $site_dir,
+          provider  => 'location',
+          allow     => 'from all',
+          options   => ['-MultiViews'],
+        }
+      ],
+      error_documents => $vhost_error_docs,
+      error_log_file  => "gitlab.${servername}.log",
+      custom_fragment => $vhost_custom_fragment,
+      require         => [
+        Ruby::Rake['gitlab_precompile_assets'],
+        Service['gitlab'],
+      ],
+    }
   }
 }

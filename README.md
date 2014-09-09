@@ -33,7 +33,8 @@ This module provides a base `gitlab` class that will be used in most manifests. 
 * *gitlab_url* Sets the URL to the GitLab application. Defaults to http://localhost/
 * *relative_url_root* Sets the relative root URL of the GitLab application. The default is `/`
 * *port* Sets the port that the GitLab application runs on. The default is `80`
-* *enable_https* If set to true, the GitLab application will use HTTPS. The default is `false`. Not yet implemented!
+* *enable_https* If set to true, the GitLab application will use HTTPS.
+* *redirect_http* If set to true, Apache will be configured to redirect port 80 to port 443.
 * *email_address* sets the default administrator email address
 * *user* sets the user that hosts the GitLab application and repositories. The default is `git`
 * *user_home* sets the home directory for the *user* and holds the GitLab application and repositories. The default is `/home/git`
@@ -66,6 +67,9 @@ This module provides a base `gitlab` class that will be used in most manifests. 
 * *project_visibility* this sets the default project sharing policy. The default is to make new projects `private`.
 * *enable_gravatar* if this is set to true, [Gravatar](https://en.gravatar.com/) user avatar images will be enabled. The default is `true`.
 * *ssh_port* sets the default SSH port that GitLab listens on. The default is 22.
+* *ssl_cert* sets the path to the Apache web server SSL certificate. The default is undefined.
+* *ssl_key* sets the path to the Apache web server SSL public key. The default is undefined.
+* *ssl_ca* sets the path to the Apache web server SSL CA certificate. The default is undefined.
 
 ### gitlab::db::postgresql
 

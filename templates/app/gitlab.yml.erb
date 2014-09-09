@@ -13,7 +13,7 @@ production: &base
   gitlab:
     ## Web server settings (note: host is the FQDN, do not include http://)
     host: <%= @servername %>
-    port: <%= @port %>
+    port: <%= @real_port %>
     https: <% if @enable_https %>true<% else %>false<% end %>
     # ssh_host: ssh.host_example.com
     <%- if @relative_url_root -%>

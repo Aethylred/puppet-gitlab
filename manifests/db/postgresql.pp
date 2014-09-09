@@ -1,3 +1,4 @@
+# Sets up the gitlab database
 class gitlab::db::postgresql (
   $db_name              = $::gitlab::db_name,
   $db_user              = $::gitlab::db_user,
