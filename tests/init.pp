@@ -13,7 +13,8 @@ include apache::mod::passenger
 include redis
 
 class{'ruby':
-  version         => '2.0.0',
+  version             => '2.0.0',
+  set_system_default  => true,
 }
 class{'ruby::dev':
   bundler_package   => 'bundler',
@@ -23,13 +24,14 @@ class{'ruby::dev':
 include postgresql::server
 include postgresql::lib::devel
 
+# Setting the gitlab_url used by gitlab shell to use localhost
+# because the FQDN of a test VM is unlikly to be real.
 class{'gitlab':
-  require           => [
+  gitlab_url  => 'http://localhost/',
+  require     => [
     Class[
-      'ruby',
       'git',
-      'postgresql::lib::devel',
-      'redis'
+      'postgresql::lib::devel'
     ],
     Package[
       'libicu-dev'

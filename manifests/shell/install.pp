@@ -1,5 +1,5 @@
 class gitlab::shell::install (
-  $gitlab_url       = $::gitlab::gitlab_url,
+  $gitlab_url       = $::gitlab::real_gitlab_url,
   $user             = $::gitlab::user,
   $user_home        = $::gitlab::user_home,
   $repository       = $::gitlab::params::gitlab_shell_repo,
@@ -11,6 +11,8 @@ class gitlab::shell::install (
   $log_level        = $::gitlab::log_level,
   $gl_shell_logfile = $::gitlab::gl_shell_logfile
 ) inherits gitlab::params {
+
+  require redis
 
   vcsrepo{'gitlab-shell':
     ensure    => 'present',

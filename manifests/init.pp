@@ -28,8 +28,8 @@
 
 # [Remember: No empty lines between comments and class definition]
 class gitlab (
-  $gitlab_url             = 'http://localhost/',
-  $relative_url_root      = '/',
+  $gitlab_url             = undef,
+  $relative_url_root      = undef,
   $port                   = '80',
   $enable_https           = false,
   $email_address          = undef,
@@ -66,6 +66,8 @@ class gitlab (
   $ssh_port               = undef
 ) inherits gitlab::params {
 
+  require redis
+
   validate_bool($install_gl_shell, $manage_db, $enable_https, $selfsigned_certs, $audit_usernames)
   validate_bool($allow_name_change, $allow_group_creation, $enable_gravatar)
   validate_bool($project_snippets, $project_wiki, $project_issues)
@@ -85,6 +87,20 @@ class gitlab (
   }
 
   $site_dir = "${app_dir}/public"
+
+  if $enable_https {
+    $url_protocol = 'https://'
+  } else {
+    $url_protocol = 'http://'
+  }
+
+  if $gitlab_url {
+    $real_gitlab_url = $gitlab_url
+  } elsif $relative_url_root {
+    $real_gitlab_url = "${url_protocol}${servername}${relative_url_root}"
+  } else  {
+    $real_gitlab_url = "${url_protocol}${servername}/"
+  }
 
   user{'gitlab':
     ensure        => present,
@@ -129,7 +145,7 @@ class gitlab (
 
   if $install_gl_shell {
     class{'gitlab::shell::install':
-      gitlab_url        => $gitlab_url,
+      gitlab_url        => $real_gitlab_url,
       user              => $user,
       user_home         => $user_home,
       repository        => $gitlab_shell_repo,
@@ -171,6 +187,7 @@ class gitlab (
     mode    => '0640',
     content => template('gitlab/app/gitlab.yml.erb'),
     require => Class['gitlab::install'],
+    notify  => [Service['httpd'],Ruby::Rake['gitlab_precompile_assets']],
   }
 
   file{'gitlab_app_rb_config':
@@ -181,6 +198,7 @@ class gitlab (
     mode    => '0640',
     content => template('gitlab/app/application.rb.erb'),
     require => Class['gitlab::install'],
+    notify  => [Service['httpd'],Ruby::Rake['gitlab_precompile_assets']],
   }
 
   file{'gitlab_db_config':
@@ -234,14 +252,22 @@ class gitlab (
     subscribe   => Ruby::Bundle['gitlab_install'],
   }
 
+  if $relative_url_root {
+    $precompile_environment = ['force=yes',"HOME=${user_home}","RAILS_RELATIVE_URL_ROOT=${relative_url_root}"]
+  } else {
+    $precompile_environment = ['force=yes',"HOME=${user_home}"]
+  }
+
   ruby::rake{'gitlab_precompile_assets':
     task        => 'assets:precompile',
-    environment => ['force=yes',"HOME=${user_home}"],
+    environment => $precompile_environment,
     bundle      => true,
-    creates     => "${site_dir}/assets",
+    # creates     => "${site_dir}/assets",
+    refreshonly => true,
     cwd         => $app_dir,
     user        => $user,
-    require     => Ruby::Bundle['gitlab_install'],
+    subscribe   => Ruby::Bundle['gitlab_install'],
+    notify      => Service['httpd'],
   }
 
   service{'gitlab':

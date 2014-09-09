@@ -50,7 +50,7 @@ describe 'gitlab', :type => :class do
         'mode'    => '0600'
       ) }
       it { should contain_class('gitlab::shell::install').with(
-        'gitlab_url'        => 'http://localhost/',
+        'gitlab_url'        => 'http://test.example.org/',
         'user'              => 'git',
         'user_home'         => '/home/git',
         'repository'        => 'https://gitlab.com/gitlab-org/gitlab-shell.git',
@@ -133,10 +133,11 @@ describe 'gitlab', :type => :class do
         'task'        => 'assets:precompile',
         'environment' => ['force=yes','HOME=/home/git'],
         'bundle'      => true,
-        'creates'     => '/home/git/gitlab/public/assets',
+        # 'creates'     => '/home/git/gitlab/public/assets',
         'cwd'         => '/home/git/gitlab',
         'user'        => 'git',
-        'require'     => ['Ruby::Bundle[gitlab_install]','Class[Ruby]']
+        'subscribe'   => 'Ruby::Bundle[gitlab_install]',
+        'notify'      => 'Service[httpd]'
       ) }
       it { should contain_service('gitlab').with(
         'ensure'      => 'running',
@@ -181,7 +182,10 @@ describe 'gitlab', :type => :class do
         %r{^    https: false$}
       ) }
       it { should contain_file('gitlab_app_config').with_content(
-        %r{^    relative_url_root: /$}
+        %r{^    # relative_url_root: /gitlab$}
+      ) }
+      it { should_not contain_file('gitlab_app_config').with_content(
+        %r{^    relative_url_root: .*$}
       ) }
       it { should contain_file('gitlab_app_config').with_content(
         %r{^    user: git$}
@@ -249,7 +253,11 @@ describe 'gitlab', :type => :class do
       ) }
       # Verify contents of gitlab_app_rb_config
       it { should contain_file('gitlab_app_rb_config').with_content(
-        %r{^    config.relative_url_root = "/"$}
+        %r{^    # config.relative_url_root = "/gitlab"$}
+      ) }
+      # Verify contents of gitlab_app_rb_config
+      it { should_not contain_file('gitlab_app_rb_config').with_content(
+        %r{^    config.relative_url_root = .*$}
       ) }
       # Verify contents of gitlab_etc_default
       it { should contain_file('gitlab_etc_default').with_content(
@@ -351,7 +359,7 @@ describe 'gitlab', :type => :class do
       ) }
       it { should contain_ruby__rake('gitlab_precompile_assets').with(
         'environment' => ['force=yes','HOME=/path/to/home'],
-        'creates'     => '/path/to/home/gitlab/public/assets',
+        # 'creates'     => '/path/to/home/gitlab/public/assets',
         'cwd'         => '/path/to/home/gitlab',
         'user'        => 'nobody'
       ) }

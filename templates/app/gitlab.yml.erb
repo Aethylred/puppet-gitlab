@@ -16,7 +16,11 @@ production: &base
     port: <%= @port %>
     https: <% if @enable_https %>true<% else %>false<% end %>
     # ssh_host: ssh.host_example.com
+    <%- if @relative_url_root -%>
     relative_url_root: <%= @relative_url_root %>
+    <%- else -%>
+    # relative_url_root: /gitlab
+    <%- end -%>
     user: <%= @user %>
 
     ## Email settings

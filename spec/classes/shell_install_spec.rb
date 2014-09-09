@@ -42,7 +42,7 @@ describe 'gitlab::shell::install', :type => :class do
           %r{^user: git$}
         ) }
         it {should contain_file('gitlab-shell-config').with_content(
-          %r{^gitlab_url: "http://localhost/"$}
+          %r{^gitlab_url: "http://test.example.org/"$}
         ) }
         it {should contain_file('gitlab-shell-config').with_content(
           %r{^  self_signed_cert: true$}
