@@ -11,7 +11,7 @@ describe 'gitlab::db::postgresql', :type => :class do
     end
     describe 'with base gitlab class (disable database management so test can redeclare)' do
       let :pre_condition do
-        "class{'gitlab': manage_db => false, }\ninclude apache"
+        "class{'gitlab': manage_db => false, }\ninclude redis\ninclude apache"
       end
       describe 'with no parameters' do
         it { should contain_class('gitlab::params') }

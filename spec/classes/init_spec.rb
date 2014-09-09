@@ -10,7 +10,7 @@ describe 'gitlab', :type => :class do
       }
     end
     let :pre_condition do
-      "include apache"
+      "include redis\ninclude apache"
     end
     describe 'with no parameters' do
       it { should contain_class('gitlab::params') }
@@ -32,7 +32,7 @@ describe 'gitlab', :type => :class do
         'path'    => '/home/git',
         'owner'   => 'git',
         'group'   => 'git',
-        'recurse' => true,
+        'recurse' => true
       ) }
       it { should contain_file('gitlab_repostiories_dir').with(
         'ensure'  => 'directory',
@@ -40,14 +40,14 @@ describe 'gitlab', :type => :class do
         'owner'   => 'git',
         'group'   => 'git',
         'mode'    => '2770',
-        'recurse' => true,
+        'recurse' => true
       ) }
       it { should contain_file('gitlab_auth_file').with(
         'ensure'  => 'file',
         'path'    => '/home/git/.ssh/authorized_keys',
         'owner'   => 'git',
         'group'   => 'git',
-        'mode'    => '0600',
+        'mode'    => '0600'
       ) }
       it { should contain_class('gitlab::shell::install').with(
         'gitlab_url'        => 'http://localhost/',
@@ -143,7 +143,7 @@ describe 'gitlab', :type => :class do
         'enable'      => true,
         'hasstatus'   => true,
         'hasrestart'  => true,
-        'require'     => 'File[gitlab_init_script]',
+        'require'     => 'File[gitlab_init_script]'
       ) }
       it { should contain_apache__vhost('gitlab').with(
         'docroot'         => '/home/git/gitlab/public',

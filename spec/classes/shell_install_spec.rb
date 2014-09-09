@@ -11,7 +11,7 @@ describe 'gitlab::shell::install', :type => :class do
     end
     describe 'with default gitlab (disable shell install so test can redeclare)' do
       let :pre_condition do
-        "class {'gitlab': install_gl_shell => false }\ninclude apache"
+        "class {'gitlab': install_gl_shell => false }\ninclude redis\ninclude apache"
       end
       describe 'with no parameters' do
         it { should contain_class('gitlab::params') }

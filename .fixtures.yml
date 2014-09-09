@@ -18,9 +18,18 @@ fixtures:
     git:
       repo: 'Aethylred-git'
       ref:  '0.1.2'
+    redis:
+      repo: 'thomasvandoren-redis'
+      ref:  '0.10.0'
+    wget:
+      repo: 'maestrodev-wget'
+      ref:  '1.5.3'
+    gcc:
+      repo: 'puppetlabs-gcc'
+      ref:  '0.2.0'
   repositories:
     ruby:
-      repo: 'git://github.com/Aethylred/puppetlabs-ruby.git'
-      ref:  'origin/rakebundle'
+      repo: 'https://github.com/puppetlabs/puppetlabs-ruby.git'
+      ref:  'origin/master'
   symlinks:
     gitlab: "#{source_dir}"
