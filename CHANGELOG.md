@@ -1,5 +1,11 @@
 # Releases
 
+##0.3.0
+- OmniAuth added for the following providers:
+  - Google
+  - GitHub
+  - Twitter
+
 ##0.2.0
 - HTTPS works
 - can redirect HTTP to HTTPS

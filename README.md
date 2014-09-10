@@ -70,10 +70,24 @@ This module provides a base `gitlab` class that will be used in most manifests. 
 * *ssl_cert* sets the path to the Apache web server SSL certificate. The default is undefined.
 * *ssl_key* sets the path to the Apache web server SSL public key. The default is undefined.
 * *ssl_ca* sets the path to the Apache web server SSL CA certificate. The default is undefined.
+* *omniauth* Hashes passed to this parameter will be used to configure OmniAuth. See the [section on configuring OmniAuth](#Using the OmniAuth parameter). The default is undefined, which disables OmniAuth.
+* *allow_sso* If set to true, this will allow GitLab to create users from SSO/OmniAuth logins. The default is false.
+* *block_auto_create* If set to true, users created by SSO/OmniAuth logins will need to be approved by an administrator before they can do anything. The default is true.
+
+#### Using the OmniAuth parameter
+
+The `omniauth` parameter on the base `gitlab` class takes an array of hashes that define an OmniAuth provider. Check the [test scripts](tests/init-omni-all.pp) for examples. More information on [GitLab OmniAuth Provers](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/integration/omniauth.md).
+
+Currently the list of supported providers is:
+- Google (`google`, `google+` or `google_oauth2`)
+- GitHub (`github`)
+- Twitter (`twitter`)
+
+**NOTE:** if the `allow_sso` is true and `block_auto_create` is false, then anyone with an identity on any of the configured OmniAuth providers can log in and use the GitLab instance.
 
 ### gitlab::db::postgresql
 
-This class sets up a postgres database for the GitLab application. It does not install postgresql, this should be declared beforehand.
+This class sets up a PostgreSQL database for the GitLab application. It does not install the PostgreSQL  service, this should be declared beforehand.
 
 * *gitlab_server* used to grant the host running the GitLab application access to the database. The default is undefined, which does not create any access rights.
 * *db_user* sets the database user for the Gitlab application database. The default is `git`
@@ -140,9 +154,11 @@ These are good implementations, but install GitLab on Ngnix, which is not what's
 * https://shanetully.com/2012/08/23/running-gitlab-from-a-subdirectory-on-apache/
 * https://github.com/gitlabhq/gitlabhq/blob/master/doc/install/installation.md
 
-## Using Shibboleth
+## Using OmniAuth and Shibboleth
+* https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/integration/omniauth.md
 * https://groups.google.com/forum/#!msg/gitlabhq/BAhpzoW9KQ8/R62OvUL04KQJ
 * https://github.com/toyokazu/omniauth-shibboleth
+* https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/integration/shibboleth.md
 
 
 # Attribution

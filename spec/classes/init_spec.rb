@@ -186,7 +186,7 @@ describe 'gitlab', :type => :class do
       it { should contain_file('gitlab_app_config').with_content(
         %r{^    # relative_url_root: /gitlab$}
       ) }
-      it { should_not contain_file('gitlab_app_config').with_content(
+      it { should contain_file('gitlab_app_config').without_content(
         %r{^    relative_url_root: .*$}
       ) }
       it { should contain_file('gitlab_app_config').with_content(
@@ -237,6 +237,33 @@ describe 'gitlab', :type => :class do
       it { should contain_file('gitlab_app_config').with_content(
         %r{^    # ssh_port: 22$}
       ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^  omniauth:$\n^    # Allow login via Twitter, Google, etc. using OmniAuth providers$\n^    enabled: false$}
+      ) }
+      it { should contain_file('gitlab_app_config').without_content(
+        %r{^  omniauth:$\n^    # Allow login via Twitter, Google, etc. using OmniAuth providers$\n^    enabled: true$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    allow_single_sign_on: false$}
+      ) }
+      it { should contain_file('gitlab_app_config').without_content(
+        %r{^    allow_single_sign_on: true$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    block_auto_created_users: true$}
+      ) }
+      it { should contain_file('gitlab_app_config').without_content(
+        %r{^    block_auto_created_users: false$}
+      ) }
+      it { should contain_file('gitlab_app_config').without_content(
+        %r{^      - \{ name: 'github', app_id: '*.'$}
+      ) }
+      it { should contain_file('gitlab_app_config').without_content(
+        %r{^      - \{ name: 'twitter', app_id: '*.'$}
+      ) }
+      it { should contain_file('gitlab_app_config').without_content(
+        %r{^      - \{ name: 'google_oauth2', app_id: '*.'$}
+      ) }
       # Verify contents of gitlab_db_config
       it { should contain_file('gitlab_db_config').with_content(
         %r{^  database: gitlab$}
@@ -258,7 +285,7 @@ describe 'gitlab', :type => :class do
         %r{^    # config.relative_url_root = "/gitlab"$}
       ) }
       # Verify contents of gitlab_app_rb_config
-      it { should_not contain_file('gitlab_app_rb_config').with_content(
+      it { should contain_file('gitlab_app_rb_config').without_content(
         %r{^    config.relative_url_root = .*$}
       ) }
       # Verify contents of gitlab_etc_default
@@ -621,6 +648,154 @@ describe 'gitlab', :type => :class do
       ) }
       it { should contain_file('gitlab_app_config').with_content(
         %r{^    ssh_port: 2222$}
+      ) }
+    end
+    describe 'when setting GitHub as an OmniAuth provider' do
+      let :params do
+        {
+          :omniauth      => [
+            { 'provider'    => 'github',
+              'app_id'      => 'YOURIDHERE',
+              'app_secret'  => 'YOURHASHHERE'
+            }
+          ]
+        }
+      end
+      it { should contain_file('gitlab_app_config').without_content(
+        %r{^  omniauth:$\n^    # Allow login via Twitter, Google, etc. using OmniAuth providers$\n^    enabled: false$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^  omniauth:$\n^    # Allow login via Twitter, Google, etc. using OmniAuth providers$\n^    enabled: true$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^      - \{ name: 'github', app_id: 'YOURIDHERE',$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^          app_secret: 'YOURHASHHERE',$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^          args: \{ scope: 'user:email' \} \}$}
+      ) }
+    end
+    describe 'when setting Twitter as an OmniAuth provider' do
+      let :params do
+        {
+          :omniauth      => [
+            { 'provider'    => 'twitter',
+              'app_id'      => 'YOURIDHERE',
+              'app_secret'  => 'YOURHASHHERE'
+            }
+          ]
+        }
+      end
+      it { should contain_file('gitlab_app_config').without_content(
+        %r{^  omniauth:$\n^    # Allow login via Twitter, Google, etc. using OmniAuth providers$\n^    enabled: false$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^  omniauth:$\n^    # Allow login via Twitter, Google, etc. using OmniAuth providers$\n^    enabled: true$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^      - \{ name: 'twitter', app_id: 'YOURIDHERE',$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^          app_secret: 'YOURHASHHERE' \}$}
+      ) }
+    end
+    describe 'when setting Google as an OmniAuth provider' do
+      let :params do
+        {
+          :omniauth      => [
+            { 'provider'    => 'google',
+              'app_id'      => 'YOURIDHERE',
+              'app_secret'  => 'YOURHASHHERE'
+            }
+          ]
+        }
+      end
+      it { should contain_file('gitlab_app_config').without_content(
+        %r{^  omniauth:$\n^    # Allow login via Twitter, Google, etc. using OmniAuth providers$\n^    enabled: false$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^  omniauth:$\n^    # Allow login via Twitter, Google, etc. using OmniAuth providers$\n^    enabled: true$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^      - \{ name: 'google_oauth2', app_id: 'YOURIDHERE',$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^          app_secret: 'YOURHASHHERE',$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^          args: \{ access_type: 'offline', approval_prompt: '' \} \}$}
+      ) }
+    end
+    describe 'when setting multiple OmniAuth providers' do
+      let :params do
+        {
+          :omniauth      => [
+            { 'provider'    => 'google',
+              'app_id'      => 'YOURGOOGLEIDHERE',
+              'app_secret'  => 'YOURGOOGLEHASHHERE'
+            },
+            { 'provider'    => 'twitter',
+              'app_id'      => 'YOURTWITTERIDHERE',
+              'app_secret'  => 'YOURTWITTERHASHHERE'
+            },
+            { 'provider'    => 'github',
+              'app_id'      => 'YOURGITHUBIDHERE',
+              'app_secret'  => 'YOURGITHUBHASHHERE'
+            }
+          ]
+        }
+      end
+      it { should contain_file('gitlab_app_config').without_content(
+        %r{^  omniauth:$\n^    # Allow login via Twitter, Google, etc. using OmniAuth providers$\n^    enabled: false$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^  omniauth:$\n^    # Allow login via Twitter, Google, etc. using OmniAuth providers$\n^    enabled: true$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^      - \{ name: 'google_oauth2', app_id: 'YOURGOOGLEIDHERE',$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^          app_secret: 'YOURGOOGLEHASHHERE',$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^          args: \{ access_type: 'offline', approval_prompt: '' \} \}$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^      - \{ name: 'twitter', app_id: 'YOURTWITTERIDHERE',$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^          app_secret: 'YOURTWITTERHASHHERE' \}$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^      - \{ name: 'github', app_id: 'YOURGITHUBIDHERE',$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^          app_secret: 'YOURGITHUBHASHHERE',$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^          args: \{ scope: 'user:email' \} \}$}
+      ) }
+    end
+    describe 'when changing user creation behaviour' do
+      let :params do
+        {
+          :allow_sso          => true,
+          :block_auto_create  => false
+        }
+      end
+      it { should contain_file('gitlab_app_config').without_content(
+        %r{^    allow_single_sign_on: false$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    allow_single_sign_on: true$}
+      ) }
+      it { should contain_file('gitlab_app_config').without_content(
+        %r{^    block_auto_created_users: true$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    block_auto_created_users: false$}
       ) }
     end
   end

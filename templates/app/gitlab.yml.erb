@@ -112,14 +112,26 @@ production: &base
   ## OmniAuth settings
   omniauth:
     # Allow login via Twitter, Google, etc. using OmniAuth providers
+    <%- if @omniauth -%>
+    enabled: true
+    <%- else -%>
     enabled: false
+    <%- end -%>
 
     # CAUTION!
     # This allows users to login without having a user account first (default: false).
     # User accounts will be created automatically when authentication was successful.
+    <%- if @allow_sso -%>
+    allow_single_sign_on: true
+    <%- else -%>
     allow_single_sign_on: false
+    <%- end -%>
     # Locks down those users until they have been cleared by the admin (default: true).
+    <%- if block_auto_create -%>
     block_auto_created_users: true
+    <%- else -%>
+    block_auto_created_users: false
+    <%- end -%>
 
     ## Auth providers
     # Uncomment the following lines and fill in the data of the auth provider you want to use
@@ -137,6 +149,24 @@ production: &base
       # - { name: 'github', app_id: 'YOUR APP ID',
       #     app_secret: 'YOUR APP SECRET',
       #     args: { scope: 'user:email' } }
+      <%- if @omniauth and ! @omniauth.empty? -%>
+        <%- [@omniauth].flatten.compact.each do |provider| -%>
+          <%- case provider['provider']-%>
+            <%- when 'github' -%>
+      - { name: 'github', app_id: '<%= provider['app_id'] %>',
+          app_secret: '<%= provider['app_secret'] %>',
+          args: { scope: 'user:email' } }
+            <%- when 'twitter' -%>
+      - { name: 'twitter', app_id: '<%= provider['app_id'] %>',
+          app_secret: '<%= provider['app_secret'] %>' }
+            <%- when 'google', 'google_oauth2', 'google+' -%>
+      - { name: 'google_oauth2', app_id: '<%= provider['app_id'] %>',
+          app_secret: '<%= provider['app_secret'] %>',
+          args: { access_type: 'offline', approval_prompt: '' } }
+            <%- else -%>
+          <%- end -%>
+        <%- end -%>
+      <%- end -%>
 
 
 

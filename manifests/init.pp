@@ -67,7 +67,10 @@ class gitlab (
   $ssh_port               = undef,
   $ssl_cert               = undef,
   $ssl_key                = undef,
-  $ssl_ca                 = undef
+  $ssl_ca                 = undef,
+  $omniauth               = undef,
+  $allow_sso              = false,
+  $block_auto_create      = true
 ) inherits gitlab::params {
 
   require redis
