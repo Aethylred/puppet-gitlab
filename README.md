@@ -76,7 +76,7 @@ This module provides a base `gitlab` class that will be used in most manifests. 
 
 #### Using the OmniAuth parameter
 
-The `omniauth` parameter on the base `gitlab` class takes an array of hashes that define an OmniAuth provider. Check the [test scripts](tests/init-omni-all.pp) for examples. More information on [GitLab OmniAuth Provers](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/integration/omniauth.md).
+The `omniauth` parameter on the base `gitlab` class takes an array of hashes that define an OmniAuth provider. Check the [test scripts](tests/init-omni-all.pp) for examples. More information on [GitLab OmniAuth Providers](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/integration/omniauth.md).
 
 Currently the list of supported providers is:
 - Google (`google`, `google+` or `google_oauth2`)
@@ -131,10 +131,10 @@ Runs the install procedure to install the GitLab command line shell, allowing it
 
 # To Do
 
-* Run the site over HTTPS
-* Configure authentication (Omniauth and Shibboleth)
+* Configure Shibboleth authentication
 * Create repositories.
 * Inject hook scripts into repositories.
+* Figure out icons for custom OmniAuth providers ([check ticket](http://feedback.gitlab.com/forums/176466-general/suggestions/5228989-allow-icons-for-custom-omniauth-providers))
 
 # References
 

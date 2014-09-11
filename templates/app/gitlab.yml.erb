@@ -112,7 +112,7 @@ production: &base
   ## OmniAuth settings
   omniauth:
     # Allow login via Twitter, Google, etc. using OmniAuth providers
-    <%- if @omniauth -%>
+    <%- if @omniauth or @shibboleth -%>
     enabled: true
     <%- else -%>
     enabled: false
@@ -127,7 +127,7 @@ production: &base
     allow_single_sign_on: false
     <%- end -%>
     # Locks down those users until they have been cleared by the admin (default: true).
-    <%- if block_auto_create -%>
+    <%- if @block_auto_create -%>
     block_auto_created_users: true
     <%- else -%>
     block_auto_created_users: false
@@ -167,8 +167,17 @@ production: &base
           <%- end -%>
         <%- end -%>
       <%- end -%>
-
-
+      <%- if @shibboleth -%>
+      - { name: 'shibboleth',
+          args: { 
+            'shib_session_id_field': "HTTP_SHIB_SESSION_ID",
+            'shib_application_id_field': "HTTP_SHIB_APPLICATION_ID",
+            'uid_field': 'HTTP_EPPN',
+            'name_field': 'HTTP_CN',
+            'info_fields': { 'email': 'HTTP_MAIL'}
+          }
+        }
+      <%- end -%>
 
   #
   # 3. Advanced settings

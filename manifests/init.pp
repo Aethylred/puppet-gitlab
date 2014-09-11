@@ -70,7 +70,8 @@ class gitlab (
   $ssl_ca                 = undef,
   $omniauth               = undef,
   $allow_sso              = false,
-  $block_auto_create      = true
+  $block_auto_create      = true,
+  $shibboleth             = false
 ) inherits gitlab::params {
 
   require redis
@@ -79,6 +80,10 @@ class gitlab (
   validate_bool($allow_name_change, $allow_group_creation, $enable_gravatar)
   validate_bool($project_snippets, $project_wiki, $project_issues)
   validate_re($project_visibility, ['^private$', '^public$', '^internal$'])
+
+  if ! $enable_https and ($shibboleth or $omniauth) {
+    fail('Authentication enabled while HTTPS disabled.')
+  }
 
   $repository_dir = "${user_home}/repositories"
   $auth_file      = "${user_home}/.ssh/authorized_keys"
@@ -257,7 +262,7 @@ class gitlab (
     timeout     => '600',
     require     => [
       File['gitlab_db_config','gitlab_app_config']
-    ],
+    ]
   }
 
   ruby::rake{'gitlab_setup':
@@ -319,32 +324,62 @@ class gitlab (
         ],
       }
     }
-    apache::vhost{'gitlab':
-      servername      => $servername,
-      serveradmin     => $email_address,
-      ssl             => true,
-      ssl_cipher      => 'SSLv3:TLSv1:+HIGH:!SSLv2:!MD5:!MEDIUM:!LOW:!EXP:!ADH:!eNULL:!aNULL',
-      ssl_cert        => $ssl_cert,
-      ssl_key         => $ssl_key,
-      ssl_ca          => $ssl_ca,
-      docroot         => $site_dir,
-      docroot_owner   => $user,
-      docroot_group   => $user,
-      port            => $real_port,
-      directories     => [
-        { path      => $site_dir,
-          provider  => 'location',
-          allow     => 'from all',
-          options   => ['-MultiViews'],
-        }
-      ],
-      error_documents => $vhost_error_docs,
-      error_log_file  => "gitlab.${servername}.log",
-      custom_fragment => $vhost_custom_fragment,
-      require         => [
-        Ruby::Rake['gitlab_precompile_assets'],
-        Service['gitlab'],
-      ],
+    if $shibboleth {
+      apache::vhost{'gitlab':
+        servername      => $servername,
+        serveradmin     => $email_address,
+        ssl             => true,
+        ssl_cipher      => 'SSLv3:TLSv1:+HIGH:!SSLv2:!MD5:!MEDIUM:!LOW:!EXP:!ADH:!eNULL:!aNULL',
+        ssl_cert        => $ssl_cert,
+        ssl_key         => $ssl_key,
+        ssl_ca          => $ssl_ca,
+        docroot         => $site_dir,
+        docroot_owner   => $user,
+        docroot_group   => $user,
+        port            => $real_port,
+        directories     => [
+          { path      => $site_dir,
+            provider  => 'location',
+            allow     => 'from all',
+            options   => ['-MultiViews'],
+          }
+        ],
+        error_documents => $vhost_error_docs,
+        error_log_file  => "gitlab.${servername}.log",
+        custom_fragment => $vhost_custom_fragment,
+        require         => [
+          Ruby::Rake['gitlab_precompile_assets'],
+          Service['gitlab'],
+        ],
+      }
+    } else {
+      apache::vhost{'gitlab':
+        servername      => $servername,
+        serveradmin     => $email_address,
+        ssl             => true,
+        ssl_cipher      => 'SSLv3:TLSv1:+HIGH:!SSLv2:!MD5:!MEDIUM:!LOW:!EXP:!ADH:!eNULL:!aNULL',
+        ssl_cert        => $ssl_cert,
+        ssl_key         => $ssl_key,
+        ssl_ca          => $ssl_ca,
+        docroot         => $site_dir,
+        docroot_owner   => $user,
+        docroot_group   => $user,
+        port            => $real_port,
+        directories     => [
+          { path      => $site_dir,
+            provider  => 'location',
+            allow     => 'from all',
+            options   => ['-MultiViews'],
+          }
+        ],
+        error_documents => $vhost_error_docs,
+        error_log_file  => "gitlab.${servername}.log",
+        custom_fragment => $vhost_custom_fragment,
+        require         => [
+          Ruby::Rake['gitlab_precompile_assets'],
+          Service['gitlab'],
+        ],
+      }
     }
   } else {
     apache::vhost{'gitlab':

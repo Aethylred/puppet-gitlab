@@ -14,6 +14,7 @@ class gitlab::install (
     source    => $repository,
     revision  => $revision,
     require   => User['gitlab'],
+    notify    => Ruby::Bundle['gitlab_install'],
   }
 
   file{'gitlab_app_dir':
