@@ -308,7 +308,7 @@ class gitlab (
     {'error_code' => '503', 'document' => '/deploy.html'}
   ]
 
-  $vhost_custom_fragment = "  CustomLog /var/log/apache2/gitlab_${servername}_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab_${servername}_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab_${servername}.log combined"
+  $vhost_custom_fragment = "  CustomLog /var/log/apache2/gitlab_${servername}_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab_${servername}_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab_${servername}.log combined\n  AllowEncodedSlashes NoDecode"
 
   if $enable_https {
     if $redirect_http {
@@ -337,13 +337,45 @@ class gitlab (
         docroot_owner   => $user,
         docroot_group   => $user,
         port            => $real_port,
-        directories     => [
-          { path      => $site_dir,
-            provider  => 'location',
-            allow     => 'from all',
-            options   => ['-MultiViews'],
+        aliases         => [
+          { alias       => '/shibboleth-sp',
+            path        => '/usr/share/shibboleth',
           }
         ],
+        directories     => [
+          { path          => '/',
+            provider      => 'location',
+            allow         => 'from all',
+            options       => ['-MultiViews'],
+          },
+          {
+            path            => '/users/auth/shibboleth/callback',
+            provider        => 'location',
+            auth_type       => 'shibboleth',
+            auth_require    => 'valid-user',
+            custom_fragment => "ShibRequestSetting requireSession 1\n    ShibUseHeaders On",
+          },
+          {
+            path      => '/shibboleth-sp',
+            provider  => 'location',
+            satisfy   => 'any',
+          },
+          {
+            path        => '/Shibboleth.sso',
+            provider    => 'location',
+            sethandler  => 'shib',
+          }
+        ],
+        rewrites        => [
+          { 'comment'       => 'Do not rewrite shibboleth requests',
+            'rewrite_cond'  => [
+              '%{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-f',
+              '%{REQUEST_URI} !/Shibboleth.sso',
+              '%{REQUEST_URI} !/shibboleth-sp',
+            ],
+          }
+        ],
+        request_headers => ["set X_FORWARDED_PROTO 'https'"],
         error_documents => $vhost_error_docs,
         error_log_file  => "gitlab.${servername}.log",
         custom_fragment => $vhost_custom_fragment,
