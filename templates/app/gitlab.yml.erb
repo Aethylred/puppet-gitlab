@@ -86,8 +86,16 @@ production: &base
   # 2. Auth settings
   # ==========================
 
-  # signup_enabled: true
-  # signin_enabled: false
+  <%- if @signup_enabled -%>
+  signup_enabled: true
+  <%- else -%>
+  signup_enabled: false
+  <%- end -%>
+  <%- if @signin_enabled -%>
+  signin_enabled: true
+  <%- else -%>
+  signin_enabled: false
+  <%- end -%>
 
   ## LDAP settings
   # You can inspect a sample of the LDAP users with login access by running:

@@ -71,7 +71,9 @@ class gitlab (
   $omniauth               = undef,
   $allow_sso              = false,
   $block_auto_create      = true,
-  $shibboleth             = false
+  $shibboleth             = false,
+  $signup_enabled         = false,
+  $signin_enabled         = true
 ) inherits gitlab::params {
 
   require redis
