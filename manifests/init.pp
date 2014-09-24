@@ -287,12 +287,12 @@ class gitlab (
     task        => 'assets:precompile',
     environment => $precompile_environment,
     bundle      => true,
-    # creates     => "${site_dir}/assets",
-    refreshonly => true,
+    creates     => "${site_dir}/assets",
     cwd         => $app_dir,
     user        => $user,
     subscribe   => Ruby::Bundle['gitlab_install'],
     notify      => Service['httpd'],
+    require     => Ruby::Rake['gitlab_setup'],
   }
 
   service{'gitlab':
@@ -318,6 +318,8 @@ class gitlab (
         servername      => $servername,
         docroot         => $site_dir,
         serveradmin     => $email_address,
+        docroot_owner   => $user,
+        docroot_group   => $user,
         port            => '80',
         directories     => {},
         rewrites        => [
@@ -356,7 +358,7 @@ class gitlab (
             provider          => 'location',
             auth_type         => 'shibboleth',
             auth_require      => 'valid-user',
-            passenger_enabled => 'off',
+            passenger_enabled => 'on',
             custom_fragment   => "ShibRequestSetting requireSession 1\n    ShibUseHeaders On",
           },
           {
