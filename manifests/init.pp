@@ -375,6 +375,7 @@ class gitlab (
               '%{REQUEST_URI} !/Shibboleth.sso',
               '%{REQUEST_URI} !/shibboleth-sp',
             ],
+#            'rewrite_rule'  => ['.* https://%{SERVER_NAME}%{REQUEST_URI} [QSA]'],
           }
         ],
         request_headers => ["set X_FORWARDED_PROTO 'https'"],
