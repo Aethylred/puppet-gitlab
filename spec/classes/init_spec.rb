@@ -54,7 +54,7 @@ describe 'gitlab', :type => :class do
         'user'              => 'git',
         'user_home'         => '/home/git',
         'repository'        => 'https://gitlab.com/gitlab-org/gitlab-shell.git',
-        'revision'          => 'v1.9.6',
+        'revision'          => 'v2.0.0',
         'repository_dir'    => '/home/git/repositories',
         'auth_file'         => '/home/git/.ssh/authorized_keys',
         'selfsigned_certs'  => true,
@@ -73,7 +73,7 @@ describe 'gitlab', :type => :class do
       it { should contain_class('gitlab::install').with(
         'app_dir'     => '/home/git/gitlab',
         'repository'  => 'https://gitlab.com/gitlab-org/gitlab-ce.git',
-        'revision'    => '7-1-stable',
+        'revision'    => '7-3-stable',
         'user'        => 'git'
       ) }
       it { should contain_file('gitlab_app_config').with(
@@ -167,7 +167,7 @@ describe 'gitlab', :type => :class do
           {'error_code' => '503', 'document' => '/deploy.html'}
         ],
         'error_log_file'  => 'gitlab.test.example.org.log',
-        'custom_fragment' => "  CustomLog /var/log/apache2/gitlab_test.example.org_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab_test.example.org_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab_test.example.org.log combined",
+        'custom_fragment' => "  CustomLog /var/log/apache2/gitlab_test.example.org_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab_test.example.org_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab_test.example.org.log combined\n  AllowEncodedSlashes NoDecode",
         'require'         => ['Ruby::Rake[gitlab_precompile_assets]','Service[gitlab]']
       ) }
       # Verify contents of gitlab_app_config
@@ -527,6 +527,8 @@ describe 'gitlab', :type => :class do
         'servername'      => 'git.somewhere.org',
         'docroot'         => '/home/git/gitlab/public',
         'serveradmin'     => 'admin@somewhere.org',
+        'docroot_owner'   => 'git',
+        'docroot_group'   => 'git',
         'port'            => '80',
         'directories'     => {},
         'rewrites'        => [
@@ -560,7 +562,7 @@ describe 'gitlab', :type => :class do
           {'error_code' => '503', 'document' => '/deploy.html'}
         ],
         'error_log_file'  => 'gitlab.git.somewhere.org.log',
-        'custom_fragment' => "  CustomLog /var/log/apache2/gitlab_git.somewhere.org_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab_git.somewhere.org_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab_git.somewhere.org.log combined",
+        'custom_fragment' => "  CustomLog /var/log/apache2/gitlab_git.somewhere.org_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab_git.somewhere.org_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab_git.somewhere.org.log combined\n  AllowEncodedSlashes NoDecode",
         'require'         => ['Ruby::Rake[gitlab_precompile_assets]','Service[gitlab]']
       ) }
       it { should contain_file('gitlab_app_config').with_content(
@@ -653,6 +655,7 @@ describe 'gitlab', :type => :class do
     describe 'when setting GitHub as an OmniAuth provider' do
       let :params do
         {
+          :enable_https  => true,
           :omniauth      => [
             { 'provider'    => 'github',
               'app_id'      => 'YOURIDHERE',
@@ -680,6 +683,7 @@ describe 'gitlab', :type => :class do
     describe 'when setting Twitter as an OmniAuth provider' do
       let :params do
         {
+          :enable_https  => true,
           :omniauth      => [
             { 'provider'    => 'twitter',
               'app_id'      => 'YOURIDHERE',
@@ -704,6 +708,7 @@ describe 'gitlab', :type => :class do
     describe 'when setting Google as an OmniAuth provider' do
       let :params do
         {
+          :enable_https  => true,
           :omniauth      => [
             { 'provider'    => 'google',
               'app_id'      => 'YOURIDHERE',
@@ -731,6 +736,7 @@ describe 'gitlab', :type => :class do
     describe 'when setting multiple OmniAuth providers' do
       let :params do
         {
+          :enable_https  => true,
           :omniauth      => [
             { 'provider'    => 'google',
               'app_id'      => 'YOURGOOGLEIDHERE',
