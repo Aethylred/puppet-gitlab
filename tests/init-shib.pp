@@ -15,6 +15,7 @@ class{'apache':
   log_formats       => { common_forwarded => '%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b'},
 }
 include apache::mod::passenger
+include apache::mod::shib
 include redis
 
 class{'ruby':
@@ -28,6 +29,25 @@ class{'ruby::dev':
 
 include postgresql::server
 include postgresql::lib::devel
+
+include shibboleth
+
+# Set up the Shibboleth Single Sign On (sso) module
+shibboleth::sso{'federation_directory':
+  discoveryURL  => 'https://example.federation.org/ds/DS',
+}
+
+shibboleth::metadata{'federation_metadata':
+  provider_uri  => 'https://example.federation.org/metadata/fed-metadata-signed.xml',
+  cert_uri      => 'http://example.federation.org/metadata/fed-metadata-cert.pem',
+}
+
+shibboleth::attribute_map{'federation_attribute_map':
+  attribute_map_uri => 'https://example.federation.org/download/attribute-map.xml',
+}
+
+include shibboleth::backend_cert
+
 
 # Upload some SSL certificates and keys here.
 

@@ -310,7 +310,7 @@ class gitlab (
     {'error_code' => '503', 'document' => '/deploy.html'}
   ]
 
-  $vhost_custom_fragment = "  CustomLog /var/log/apache2/gitlab_${servername}_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab_${servername}_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab_${servername}.log combined\n  AllowEncodedSlashes NoDecode"
+  $vhost_custom_fragment = "  CustomLog /var/log/apache2/gitlab_${servername}_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab_${servername}_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab_${servername}.log combined"
 
   if $enable_https {
     if $redirect_http {
@@ -330,18 +330,18 @@ class gitlab (
     }
     if $shibboleth {
       apache::vhost{'gitlab':
-        servername      => $servername,
-        serveradmin     => $email_address,
-        ssl             => true,
-        ssl_cipher      => 'SSLv3:TLSv1:+HIGH:!SSLv2:!MD5:!MEDIUM:!LOW:!EXP:!ADH:!eNULL:!aNULL',
-        ssl_cert        => $ssl_cert,
-        ssl_key         => $ssl_key,
-        ssl_ca          => $ssl_ca,
-        docroot         => $site_dir,
-        docroot_owner   => $user,
-        docroot_group   => $user,
-        port            => $real_port,
-        aliases         => [
+        servername            => $servername,
+        serveradmin           => $email_address,
+        ssl                   => true,
+        ssl_cipher            => 'SSLv3:TLSv1:+HIGH:!SSLv2:!MD5:!MEDIUM:!LOW:!EXP:!ADH:!eNULL:!aNULL',
+        ssl_cert              => $ssl_cert,
+        ssl_key               => $ssl_key,
+        ssl_ca                => $ssl_ca,
+        docroot               => $site_dir,
+        docroot_owner         => $user,
+        docroot_group         => $user,
+        port                  => $real_port,
+        aliases               => [
           { alias       => '/shibboleth-sp',
             path        => '/usr/share/shibboleth',
           }
@@ -354,12 +354,13 @@ class gitlab (
             passenger_enabled => 'on',
           },
           {
-            path              => '/users/auth/shibboleth/callback',
-            provider          => 'location',
-            auth_type         => 'shibboleth',
-            auth_require      => 'valid-user',
-            passenger_enabled => 'on',
-            custom_fragment   => "ShibRequestSetting requireSession 1\n    ShibUseHeaders On",
+            path                  => '/users/auth/shibboleth/callback',
+            provider              => 'location',
+            auth_type             => 'shibboleth',
+            auth_require          => 'valid-user',
+            passenger_enabled     => 'on',
+            shib_request_setting  => 'requireSession 1',
+            shib_use_headers      => 'On',
           },
           {
             path              => '/shibboleth-sp',
@@ -384,39 +385,41 @@ class gitlab (
 #            'rewrite_rule'  => ['.* https://%{SERVER_NAME}%{REQUEST_URI} [QSA]'],
           }
         ],
-        request_headers => ["set X_FORWARDED_PROTO 'https'"],
-        error_documents => $vhost_error_docs,
-        error_log_file  => "gitlab.${servername}.log",
-        custom_fragment => $vhost_custom_fragment,
-        require         => [
+        request_headers       => ["set X_FORWARDED_PROTO 'https'"],
+        error_documents       => $vhost_error_docs,
+        error_log_file        => "gitlab.${servername}.log",
+        custom_fragment       => $vhost_custom_fragment,
+        allow_encoded_slashes => 'nodecode',
+        require               => [
           Ruby::Rake['gitlab_precompile_assets'],
           Service['gitlab'],
         ],
       }
     } else {
       apache::vhost{'gitlab':
-        servername      => $servername,
-        serveradmin     => $email_address,
-        ssl             => true,
-        ssl_cipher      => 'SSLv3:TLSv1:+HIGH:!SSLv2:!MD5:!MEDIUM:!LOW:!EXP:!ADH:!eNULL:!aNULL',
-        ssl_cert        => $ssl_cert,
-        ssl_key         => $ssl_key,
-        ssl_ca          => $ssl_ca,
-        docroot         => $site_dir,
-        docroot_owner   => $user,
-        docroot_group   => $user,
-        port            => $real_port,
-        directories     => [
+        servername            => $servername,
+        serveradmin           => $email_address,
+        ssl                   => true,
+        ssl_cipher            => 'SSLv3:TLSv1:+HIGH:!SSLv2:!MD5:!MEDIUM:!LOW:!EXP:!ADH:!eNULL:!aNULL',
+        ssl_cert              => $ssl_cert,
+        ssl_key               => $ssl_key,
+        ssl_ca                => $ssl_ca,
+        docroot               => $site_dir,
+        docroot_owner         => $user,
+        docroot_group         => $user,
+        port                  => $real_port,
+        directories           => [
           { path      => $site_dir,
             provider  => 'location',
             allow     => 'from all',
             options   => ['-MultiViews'],
           }
         ],
-        error_documents => $vhost_error_docs,
-        error_log_file  => "gitlab.${servername}.log",
-        custom_fragment => $vhost_custom_fragment,
-        require         => [
+        error_documents       => $vhost_error_docs,
+        error_log_file        => "gitlab.${servername}.log",
+        custom_fragment       => $vhost_custom_fragment,
+        allow_encoded_slashes => 'nodecode',
+        require               => [
           Ruby::Rake['gitlab_precompile_assets'],
           Service['gitlab'],
         ],
@@ -424,23 +427,24 @@ class gitlab (
     }
   } else {
     apache::vhost{'gitlab':
-      servername      => $servername,
-      serveradmin     => $email_address,
-      docroot         => $site_dir,
-      docroot_owner   => $user,
-      docroot_group   => $user,
-      port            => $real_port,
-      directories     => [
+      servername            => $servername,
+      serveradmin           => $email_address,
+      docroot               => $site_dir,
+      docroot_owner         => $user,
+      docroot_group         => $user,
+      port                  => $real_port,
+      directories           => [
         { path      => $site_dir,
           provider  => 'location',
           allow     => 'from all',
           options   => ['-MultiViews'],
         }
       ],
-      error_documents => $vhost_error_docs,
-      error_log_file  => "gitlab.${servername}.log",
-      custom_fragment => $vhost_custom_fragment,
-      require         => [
+      error_documents       => $vhost_error_docs,
+      error_log_file        => "gitlab.${servername}.log",
+      allow_encoded_slashes => 'nodecode',
+      custom_fragment       => $vhost_custom_fragment,
+      require               => [
         Ruby::Rake['gitlab_precompile_assets'],
         Service['gitlab'],
       ],

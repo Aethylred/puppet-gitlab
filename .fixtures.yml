@@ -3,9 +3,9 @@ fixtures:
     stdlib:
       repo: 'puppetlabs-stdlib'
       ref:  '4.2.2'
-    apache:
-      repo: 'puppetlabs-apache'
-      ref:  '1.0.1'
+    # apache:
+    #   repo: 'puppetlabs-apache'
+    #   ref:  '1.0.1'
     concat:
       repo: 'puppetlabs-concat'
       ref:  '1.1.0'
@@ -31,5 +31,8 @@ fixtures:
     ruby:
       repo: 'https://github.com/puppetlabs/puppetlabs-ruby.git'
       ref:  'origin/master'
+    apache:
+      repo: 'https://github.com/Aethylred/puppetlabs-apache.git'
+      ref:  'origin/mod_shib'
   symlinks:
     gitlab: "#{source_dir}"

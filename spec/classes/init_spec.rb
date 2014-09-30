@@ -167,7 +167,8 @@ describe 'gitlab', :type => :class do
           {'error_code' => '503', 'document' => '/deploy.html'}
         ],
         'error_log_file'  => 'gitlab.test.example.org.log',
-        'custom_fragment' => "  CustomLog /var/log/apache2/gitlab_test.example.org_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab_test.example.org_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab_test.example.org.log combined\n  AllowEncodedSlashes NoDecode",
+        'custom_fragment' => "  CustomLog /var/log/apache2/gitlab_test.example.org_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab_test.example.org_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab_test.example.org.log combined",
+        'allow_encoded_slashes' => 'nodecode',
         'require'         => ['Ruby::Rake[gitlab_precompile_assets]','Service[gitlab]']
       ) }
       # Verify contents of gitlab_app_config
@@ -562,7 +563,8 @@ describe 'gitlab', :type => :class do
           {'error_code' => '503', 'document' => '/deploy.html'}
         ],
         'error_log_file'  => 'gitlab.git.somewhere.org.log',
-        'custom_fragment' => "  CustomLog /var/log/apache2/gitlab_git.somewhere.org_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab_git.somewhere.org_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab_git.somewhere.org.log combined\n  AllowEncodedSlashes NoDecode",
+        'custom_fragment' => "  CustomLog /var/log/apache2/gitlab_git.somewhere.org_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab_git.somewhere.org_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab_git.somewhere.org.log combined",
+        'allow_encoded_slashes' => 'nodecode',
         'require'         => ['Ruby::Rake[gitlab_precompile_assets]','Service[gitlab]']
       ) }
       it { should contain_file('gitlab_app_config').with_content(
