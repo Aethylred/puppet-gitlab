@@ -34,7 +34,8 @@ class{'gitlab':
   enable_https  => true,
   redirect_http => true,
   omniauth      => [
-    { 'provider'    => 'google',
+    {
+      'provider'    => 'google',
       'app_id'      => 'YOURIDHERE',
       'app_secret'  => 'YOURHASHHERE'
     }

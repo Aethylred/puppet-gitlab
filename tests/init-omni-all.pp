@@ -34,15 +34,18 @@ class{'gitlab':
   enable_https  => true,
   redirect_http => true,
   omniauth      => [
-    { 'provider'    => 'twitter',
+    {
+      'provider'    => 'twitter',
       'app_id'      => 'YOURIDHERE',
       'app_secret'  => 'YOURHASHHERE'
     },
-    { 'provider'    => 'google',
+    {
+      'provider'    => 'google',
       'app_id'      => 'YOURIDHERE',
       'app_secret'  => 'YOURHASHHERE'
     },
-    { 'provider'    => 'github',
+    {
+      'provider'    => 'github',
       'app_id'      => 'YOURIDHERE',
       'app_secret'  => 'YOURHASHHERE'
     }

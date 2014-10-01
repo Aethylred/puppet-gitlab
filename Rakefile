@@ -1,9 +1,14 @@
 require 'puppetlabs_spec_helper/rake_tasks'
 require 'puppet-lint/tasks/puppet-lint'
 PuppetLint.configuration.send('disable_80chars')
-PuppetLint.configuration.send('disable_class_parameter_defaults')
 PuppetLint.configuration.send('disable_class_inherits_from_params_class')
-PuppetLint.configuration.ignore_paths = ['spec/**/*.pp', 'pkg/**/*.pp', 'tests/**/*.pp']
+PuppetLint.configuration.send('disable_documentation')
+exclude_paths = [
+  "vendor/**/*",
+  "tests/**/*"
+]
+PuppetLint.configuration.ignore_paths = exclude_paths
+PuppetSyntax.exclude_paths = exclude_paths
 
 desc 'Check for puppet syntax errors.'
 task :validate_puppet_syntax do

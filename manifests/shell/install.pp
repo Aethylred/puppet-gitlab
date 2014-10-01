@@ -16,13 +16,13 @@ class gitlab::shell::install (
   require redis
 
   vcsrepo{'gitlab-shell':
-    ensure    => 'present',
-    path      => "${user_home}/gitlab-shell",
-    provider  => git,
-    user      => $user,
-    source    => $repository,
-    revision  => $revision,
-    require   => User['gitlab'],
+    ensure   => 'present',
+    path     => "${user_home}/gitlab-shell",
+    provider => git,
+    user     => $user,
+    source   => $repository,
+    revision => $revision,
+    require  => User['gitlab'],
   }
 
   file{'gitlab-shell-config':

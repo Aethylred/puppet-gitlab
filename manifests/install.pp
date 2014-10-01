@@ -7,14 +7,14 @@ class gitlab::install (
 ) inherits gitlab::params {
 
   vcsrepo{'gitlab_app':
-    ensure    => 'present',
-    path      => $app_dir,
-    provider  => 'git',
-    user      => $user,
-    source    => $repository,
-    revision  => $revision,
-    require   => User['gitlab'],
-    notify    => Ruby::Bundle['gitlab_install'],
+    ensure   => 'present',
+    path     => $app_dir,
+    provider => 'git',
+    user     => $user,
+    source   => $repository,
+    revision => $revision,
+    require  => User['gitlab'],
+    notify   => Ruby::Bundle['gitlab_install'],
   }
 
   file{'gitlab_app_dir':

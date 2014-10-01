@@ -128,19 +128,19 @@ class gitlab (
   }
 
   user{'gitlab':
-    ensure        => present,
-    name          => $user,
-    home          => $user_home,
-    password      => '!',
-    comment       => 'GitLab services and application user',
-    managehome    => true,
-    shell         => '/bin/bash',
+    ensure     => present,
+    name       => $user,
+    home       => $user_home,
+    password   => '!',
+    comment    => 'GitLab services and application user',
+    managehome => true,
+    shell      => '/bin/bash',
   }
 
   git::user{$user:
-    user_name   => 'GitLab',
-    user_email  => $real_email,
-    require     => User['gitlab'],
+    user_name  => 'GitLab',
+    user_email => $real_email,
+    require    => User['gitlab'],
   }
 
   file{'gitlab_home':
@@ -161,27 +161,27 @@ class gitlab (
   }
 
   file{'gitlab_auth_file':
-    ensure  => 'file',
-    path    => $auth_file,
-    owner   => $user,
-    group   => $user,
-    mode    => '0600',
+    ensure => 'file',
+    path   => $auth_file,
+    owner  => $user,
+    group  => $user,
+    mode   => '0600',
   }
 
   if $install_gl_shell {
     class{'gitlab::shell::install':
-      gitlab_url        => $real_gitlab_url,
-      user              => $user,
-      user_home         => $user_home,
-      repository        => $gitlab_shell_repo,
-      revision          => $gitlab_shell_rev,
-      repository_dir    => $repository_dir,
-      auth_file         => $auth_file,
-      selfsigned_certs  => $selfsigned_certs,
-      audit_usernames   => $audit_usernames,
-      log_level         => $log_level,
-      gl_shell_logfile  => $gl_shell_logfile,
-      before            => Ruby::Bundle['gitlab_install'],
+      gitlab_url       => $real_gitlab_url,
+      user             => $user,
+      user_home        => $user_home,
+      repository       => $gitlab_shell_repo,
+      revision         => $gitlab_shell_rev,
+      repository_dir   => $repository_dir,
+      auth_file        => $auth_file,
+      selfsigned_certs => $selfsigned_certs,
+      audit_usernames  => $audit_usernames,
+      log_level        => $log_level,
+      gl_shell_logfile => $gl_shell_logfile,
+      before           => Ruby::Bundle['gitlab_install'],
     }
   }
 
@@ -198,10 +198,10 @@ class gitlab (
   }
 
   class{'gitlab::install':
-    app_dir     => $app_dir,
-    repository  => $gitlab_app_repo,
-    revision    => $gitlab_app_rev,
-    user        => $user,
+    app_dir    => $app_dir,
+    repository => $gitlab_app_repo,
+    revision   => $gitlab_app_rev,
+    user       => $user,
   }
 
   file{'gitlab_app_config':
@@ -296,18 +296,30 @@ class gitlab (
   }
 
   service{'gitlab':
-    ensure      => 'running',
-    enable      => true,
-    hasstatus   => true,
-    hasrestart  => true,
-    require     => File['gitlab_init_script'],
+    ensure     => 'running',
+    enable     => true,
+    hasstatus  => true,
+    hasrestart => true,
+    require    => File['gitlab_init_script'],
   }
 
   $vhost_error_docs = [
-    {'error_code' => '404', 'document' => '/404.html'},
-    {'error_code' => '422', 'document' => '/422.html'},
-    {'error_code' => '500', 'document' => '/500.html'},
-    {'error_code' => '503', 'document' => '/deploy.html'}
+    {
+      'error_code' => '404',
+      'document'   => '/404.html'
+    },
+    {
+      'error_code' => '422',
+      'document'   => '/422.html'
+    },
+    {
+      'error_code' => '500',
+      'document'   => '/500.html'
+    },
+    {
+      'error_code' => '503',
+      'document'   => '/deploy.html'
+    }
   ]
 
   $vhost_custom_fragment = "  CustomLog /var/log/apache2/gitlab_${servername}_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab_${servername}_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab_${servername}.log combined"
@@ -315,16 +327,20 @@ class gitlab (
   if $enable_https {
     if $redirect_http {
       apache::vhost{'gitlab_http_redirect':
-        servername      => $servername,
-        docroot         => $site_dir,
-        serveradmin     => $email_address,
-        docroot_owner   => $user,
-        docroot_group   => $user,
-        port            => '80',
-        directories     => {},
-        rewrites        => [
-          {'rewrite_cond'  => '%{HTTPS} !=on'},
-          {'rewrite_rule'  => '.* https://%{SERVER_NAME}%{REQUEST_URI} [NE,R,L]'}
+        servername    => $servername,
+        docroot       => $site_dir,
+        serveradmin   => $email_address,
+        docroot_owner => $user,
+        docroot_group => $user,
+        port          => '80',
+        directories   => {},
+        rewrites      => [
+          {
+            'rewrite_cond' => '%{HTTPS} !=on'
+          },
+          {
+            'rewrite_rule' => '.* https://%{SERVER_NAME}%{REQUEST_URI} [NE,R,L]'
+          }
         ],
       }
     }
@@ -342,25 +358,27 @@ class gitlab (
         docroot_group         => $user,
         port                  => $real_port,
         aliases               => [
-          { alias       => '/shibboleth-sp',
-            path        => '/usr/share/shibboleth',
+          {
+            alias => '/shibboleth-sp',
+            path  => '/usr/share/shibboleth',
           }
         ],
-        directories     => [
-          { path              => '/',
+        directories           => [
+          {
+            path              => '/',
             provider          => 'location',
             allow             => 'from all',
             options           => ['-MultiViews'],
             passenger_enabled => 'on',
           },
           {
-            path                  => '/users/auth/shibboleth/callback',
-            provider              => 'location',
-            auth_type             => 'shibboleth',
-            auth_require          => 'valid-user',
-            passenger_enabled     => 'on',
-            shib_request_setting  => 'requireSession 1',
-            shib_use_headers      => 'On',
+            path                 => '/users/auth/shibboleth/callback',
+            provider             => 'location',
+            auth_type            => 'shibboleth',
+            auth_require         => 'valid-user',
+            passenger_enabled    => 'on',
+            shib_request_setting => 'requireSession 1',
+            shib_use_headers     => 'On',
           },
           {
             path              => '/shibboleth-sp',
@@ -375,9 +393,9 @@ class gitlab (
             sethandler        => 'shib',
           }
         ],
-        rewrites        => [
-          { 'comment'       => 'Do not rewrite shibboleth requests',
-            'rewrite_cond'  => [
+        rewrites              => [
+          { 'comment'      => 'Do not rewrite shibboleth requests',
+            'rewrite_cond' => [
               '%{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-f',
               '%{REQUEST_URI} !/Shibboleth.sso',
               '%{REQUEST_URI} !/shibboleth-sp',
@@ -409,10 +427,10 @@ class gitlab (
         docroot_group         => $user,
         port                  => $real_port,
         directories           => [
-          { path      => $site_dir,
-            provider  => 'location',
-            allow     => 'from all',
-            options   => ['-MultiViews'],
+          { path     => $site_dir,
+            provider => 'location',
+            allow    => 'from all',
+            options  => ['-MultiViews'],
           }
         ],
         error_documents       => $vhost_error_docs,
@@ -434,10 +452,11 @@ class gitlab (
       docroot_group         => $user,
       port                  => $real_port,
       directories           => [
-        { path      => $site_dir,
-          provider  => 'location',
-          allow     => 'from all',
-          options   => ['-MultiViews'],
+        {
+          path     => $site_dir,
+          provider => 'location',
+          allow    => 'from all',
+          options  => ['-MultiViews'],
         }
       ],
       error_documents       => $vhost_error_docs,
