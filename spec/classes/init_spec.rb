@@ -735,6 +735,109 @@ describe 'gitlab', :type => :class do
         %r{^          args: \{ access_type: 'offline', approval_prompt: '' \} \}$}
       ) }
     end
+    describe 'when setting Shibboleth as an OmniAuth provider' do
+      let :params do
+        {
+          :enable_https => true,
+          :shibboleth   => true
+        }
+      end
+      it { should contain_apache__vhost('gitlab').with_aliases(
+        [
+          {
+            'alias' => '/shibboleth-sp',
+            'path'  => '/usr/share/shibboleth',
+          }
+        ]
+      ) }
+      it { should contain_apache__vhost('gitlab').with_rewrites(
+        [
+          { 'comment'      => 'Do not rewrite shibboleth requests',
+            'rewrite_cond' => [
+              '%{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-f',
+              '%{REQUEST_URI} !/Shibboleth.sso',
+              '%{REQUEST_URI} !/shibboleth-sp',
+            ],
+          }
+        ]
+      ) }
+      it { should contain_apache__vhost('gitlab').with_directories(
+        [
+          {
+            'path'              => '/',
+            'provider'          => 'location',
+            'allow'             => 'from all',
+            'options'           => ['-MultiViews'],
+            'passenger_enabled' => 'on',
+          },
+          {
+            'path'                 => '/users/auth/shibboleth/callback',
+            'provider'             => 'location',
+            'auth_type'            => 'shibboleth',
+            'auth_require'         => 'valid-user',
+            'passenger_enabled'    => 'on',
+            'shib_request_setting' => 'requireSession 1',
+            'shib_use_headers'     => 'On',
+          },
+          {
+            'path'              => '/shibboleth-sp',
+            'provider'          => 'location',
+            'passenger_enabled' => 'off',
+            'satisfy'           => 'any',
+          },
+          {
+            'path'              => '/Shibboleth.sso',
+            'provider'          => 'location',
+            'passenger_enabled' => 'off',
+            'sethandler'        => 'shib',
+          }
+        ]
+      ) }
+      it { should contain_apache__vhost('gitlab').with(
+        'servername'      => 'test.example.org',
+        'serveradmin'     => nil,
+        'docroot'         => '/home/git/gitlab/public',
+        'docroot_owner'   => 'git',
+        'docroot_group'   => 'git',
+        'port'            => '443',
+        'ssl'                   => true,
+        'ssl_cipher'            => 'SSLv3:TLSv1:+HIGH:!SSLv2:!MD5:!MEDIUM:!LOW:!EXP:!ADH:!eNULL:!aNULL',
+        'error_documents' => [
+          {'error_code' => '404', 'document' => '/404.html'},
+          {'error_code' => '422', 'document' => '/422.html'},
+          {'error_code' => '500', 'document' => '/500.html'},
+          {'error_code' => '503', 'document' => '/deploy.html'}
+        ],
+        'error_log_file'  => 'gitlab.test.example.org.log',
+        'custom_fragment' => "  CustomLog /var/log/apache2/gitlab_test.example.org_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab_test.example.org_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab_test.example.org.log combined",
+        'allow_encoded_slashes' => 'nodecode',
+        'require'         => ['Ruby::Rake[gitlab_precompile_assets]','Service[gitlab]']
+      ) }
+      it { should contain_file('gitlab_app_config').without_content(
+        %r{^  omniauth:$\n^    # Allow login via Twitter, Google, etc. using OmniAuth providers$\n^    enabled: false$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^  omniauth:$\n^    # Allow login via Twitter, Google, etc. using OmniAuth providers$\n^    enabled: true$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^      - \{ name: 'shibboleth',$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^            'shib_session_id_field': "HTTP_SHIB_SESSION_ID",$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^            'shib_application_id_field': "HTTP_SHIB_APPLICATION_ID",$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^            'uid_field': 'HTTP_EPPN',$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^            'name_field': 'HTTP_CN',$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^            'info_fields': \{ 'email': 'HTTP_MAIL'\}$}
+      ) }
+    end
     describe 'when setting multiple OmniAuth providers' do
       let :params do
         {

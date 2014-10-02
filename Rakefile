@@ -4,7 +4,9 @@ PuppetLint.configuration.send('disable_80chars')
 PuppetLint.configuration.send('disable_class_inherits_from_params_class')
 PuppetLint.configuration.send('disable_documentation')
 exclude_paths = [
+  "pkg/**/*",
   "vendor/**/*",
+  "spec/**/*",
   "tests/**/*"
 ]
 PuppetLint.configuration.ignore_paths = exclude_paths

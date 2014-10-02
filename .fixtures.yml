@@ -32,7 +32,7 @@ fixtures:
       repo: 'https://github.com/puppetlabs/puppetlabs-ruby.git'
       ref:  'origin/master'
     apache:
-      repo: 'https://github.com/Aethylred/puppetlabs-apache.git'
-      ref:  'origin/mod_shib'
+      repo: 'https://github.com/puppetlabs/puppetlabs-apache.git'
+      ref:  'origin/master'
   symlinks:
     gitlab: "#{source_dir}"

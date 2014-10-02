@@ -83,7 +83,7 @@ class gitlab (
   validate_bool($project_snippets, $project_wiki, $project_issues)
   validate_re($project_visibility, ['^private$', '^public$', '^internal$'])
 
-  if ! $enable_https and ($shibboleth or $omniauth) {
+  if ! $enable_https and ($omniauth or $shibboleth) {
     fail('Authentication enabled while HTTPS disabled.')
   }
 
