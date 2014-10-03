@@ -74,7 +74,7 @@ This module provides a base `gitlab` class that will be used in most manifests. 
 * *omniauth* Hashes passed to this parameter will be used to configure OmniAuth. See the [section on configuring OmniAuth](#Using the OmniAuth parameter). The default is undefined, which disables OmniAuth.
 * *allow_sso* If set to true, this will allow GitLab to create users from SSO/OmniAuth logins. The default is false.
 * *block_auto_create* If set to true, users created by SSO/OmniAuth logins will need to be approved by an administrator before they can do anything. The default is true.
-* *shibboleth* If sets to true this configures GitLab to use the Shibboleth OmniAuth provider. See the section on [Shibboleth] for details.
+* *shibboleth* If sets to true this configures GitLab to use the Shibboleth OmniAuth provider. See the section on [Shibboleth](#Shibboleth) for details.
 
 #### Using the OmniAuth parameter
 
