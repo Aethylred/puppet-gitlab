@@ -1,5 +1,8 @@
 # Releases
 
+##0.4.0
+- Shibboleth OmniAuth.
+
 ##0.3.0
 - OmniAuth added for the following providers:
   - Google
