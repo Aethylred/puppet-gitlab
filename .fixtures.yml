@@ -2,19 +2,22 @@ fixtures:
   forge_modules:
     stdlib:
       repo: 'puppetlabs-stdlib'
-      ref:  '4.2.2'
+      ref:  '4.3.2'
     # apache:
     #   repo: 'puppetlabs-apache'
-    #   ref:  '1.0.1'
+    #   ref:  '1.1.1'
     concat:
       repo: 'puppetlabs-concat'
       ref:  '1.1.0'
     vcsrepo:
       repo: 'puppetlabs-vcsrepo'
-      ref:  '1.0.2'
+      ref:  '1.1.0'
     postgresql:
       repo: 'puppetlabs-postgresql'
-      ref:  '3.3.3'
+      ref:  '3.4.2'
+    ruby:
+      repo: 'puppetlabs-ruby'
+      ref:  '0.3.0'
     git:
       repo: 'Aethylred-git'
       ref:  '0.1.2'
@@ -23,16 +26,13 @@ fixtures:
       ref:  '0.10.0'
     wget:
       repo: 'maestrodev-wget'
-      ref:  '1.5.3'
+      ref:  '1.5.6'
     gcc:
       repo: 'puppetlabs-gcc'
       ref:  '0.2.0'
   repositories:
-    ruby:
-      repo: 'https://github.com/puppetlabs/puppetlabs-ruby.git'
-      ref:  'origin/master'
     apache:
       repo: 'https://github.com/puppetlabs/puppetlabs-apache.git'
-      ref:  'origin/master'
+      ref: 'origin/master'
   symlinks:
     gitlab: "#{source_dir}"

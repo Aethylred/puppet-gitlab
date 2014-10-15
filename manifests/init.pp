@@ -104,13 +104,13 @@ class gitlab (
 
   if $port {
     $real_port    = $port
-    $port_striing = ":${port}"
+    $port_string = ":${port}"
   } elsif $enable_https {
     $real_port    = '443'
-    $port_striing = ''
+    $port_string = ''
   } else {
     $real_port    = '80'
-    $port_striing = ''
+    $port_string = ''
   }
 
   if $enable_https {

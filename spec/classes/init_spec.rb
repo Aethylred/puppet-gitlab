@@ -153,13 +153,6 @@ describe 'gitlab', :type => :class do
         'docroot_owner'   => 'git',
         'docroot_group'   => 'git',
         'port'            => '80',
-        'directories'     => [
-          { 'path'      => '/home/git/gitlab/public',
-            'provider'  => 'location',
-            'allow'     => 'from all',
-            'options'   => ['-MultiViews'],
-          }
-        ],
         'error_documents' => [
           {'error_code' => '404', 'document' => '/404.html'},
           {'error_code' => '422', 'document' => '/422.html'},
@@ -170,6 +163,14 @@ describe 'gitlab', :type => :class do
         'custom_fragment' => "  CustomLog /var/log/apache2/gitlab_test.example.org_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab_test.example.org_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab_test.example.org.log combined",
         'allow_encoded_slashes' => 'nodecode',
         'require'         => ['Ruby::Rake[gitlab_precompile_assets]','Service[gitlab]']
+      ) }
+      it { should contain_apache__vhost('gitlab').with_directories(
+        {
+          'provider'  => 'location',
+          'path'      => '/home/git/gitlab/public',
+          'allow'     => 'from all',
+          'options'   => ['-MultiViews'],
+        }
       ) }
       # Verify contents of gitlab_app_config
       it { should contain_file('gitlab_app_config').with_content(
@@ -397,13 +398,12 @@ describe 'gitlab', :type => :class do
         'docroot'         => '/path/to/home/gitlab/public',
         'docroot_owner'   => 'nobody',
         'docroot_group'   => 'nobody',
-        'directories'     => [
-          { 'path'      => '/path/to/home/gitlab/public',
+        'directories'     => {
+          'path'      => '/path/to/home/gitlab/public',
             'provider'  => 'location',
             'allow'     => 'from all',
             'options'   => ['-MultiViews'],
-          }
-        ]
+        }
       ) }
       it { should contain_file('gitlab_app_config').with_content(
         %r{^  gitlab_shell:$\s^    path: /path/to/home/gitlab-shell/$}
@@ -549,13 +549,12 @@ describe 'gitlab', :type => :class do
         'docroot_owner'   => 'git',
         'docroot_group'   => 'git',
         'port'            => '8080',
-        'directories'     => [
-          { 'path'      => '/home/git/gitlab/public',
-            'provider'  => 'location',
-            'allow'     => 'from all',
-            'options'   => ['-MultiViews'],
-          }
-        ],
+        'directories'     => {
+          'path'      => '/home/git/gitlab/public',
+          'provider'  => 'location',
+          'allow'     => 'from all',
+          'options'   => ['-MultiViews'],
+        },
         'error_documents' => [
           {'error_code' => '404', 'document' => '/404.html'},
           {'error_code' => '422', 'document' => '/422.html'},
@@ -743,23 +742,20 @@ describe 'gitlab', :type => :class do
         }
       end
       it { should contain_apache__vhost('gitlab').with_aliases(
-        [
-          {
-            'alias' => '/shibboleth-sp',
-            'path'  => '/usr/share/shibboleth',
-          }
-        ]
+        {
+          'path'  => '/usr/share/shibboleth',
+          'alias' => '/shibboleth-sp',
+        }
       ) }
       it { should contain_apache__vhost('gitlab').with_rewrites(
-        [
-          { 'comment'      => 'Do not rewrite shibboleth requests',
-            'rewrite_cond' => [
-              '%{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-f',
-              '%{REQUEST_URI} !/Shibboleth.sso',
-              '%{REQUEST_URI} !/shibboleth-sp',
-            ],
-          }
-        ]
+        {
+          'comment'      => 'Do not rewrite shibboleth requests',
+          'rewrite_cond' => [
+            '%{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-f',
+            '%{REQUEST_URI} !/Shibboleth.sso',
+            '%{REQUEST_URI} !/shibboleth-sp',
+          ],
+        }
       ) }
       it { should contain_apache__vhost('gitlab').with_directories(
         [
@@ -920,11 +916,9 @@ describe 'gitlab', :type => :class do
         :fqdn                   => 'test.example.org',
       }
     end
-    it do
-      expect {
-        should contain_class('gitlab::params')
-      }.to raise_error(Puppet::Error, /The GitLab Puppet module does not support RedHat family of operating systems/)
-    end
+    it {
+      should raise_error(Puppet::Error, /The GitLab Puppet module does not support RedHat family of operating systems/)
+    }
   end
 
     context 'on an Unknown OS' do
@@ -936,11 +930,9 @@ describe 'gitlab', :type => :class do
         :fqdn                   => 'test.example.org',
       }
     end
-    it do
-      expect {
-        should contain_class('gitlab::params')
-      }.to raise_error(Puppet::Error, /The GitLab Puppet module does not support Unknown family of operating systems/)
-    end
+    it {
+      should raise_error(Puppet::Error, /The GitLab Puppet module does not support Unknown family of operating systems/)
+    }
   end
 
 end
