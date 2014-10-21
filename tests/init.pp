@@ -22,7 +22,9 @@ class{'ruby::dev':
 }
 
 include postgresql::server
-include postgresql::lib::devel
+class {'postgresql::lib::devel':
+  link_pg_config => false,
+}
 
 # Setting the gitlab_url used by gitlab shell to use localhost
 # because the FQDN of a test VM is unlikly to be real.

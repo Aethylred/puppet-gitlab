@@ -23,7 +23,9 @@ class{'ruby::dev':
 }
 
 include postgresql::server
-include postgresql::lib::devel
+class {'postgresql::lib::devel':
+  link_pg_config => false,
+}
 
 # Upload some SSL certificates and keys here.
 
