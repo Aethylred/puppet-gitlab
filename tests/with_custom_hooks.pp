@@ -4,6 +4,7 @@ class{'git': }
 package{'libicu-dev':
   ensure => 'present',
 }
+
 package{'cmake':
   ensure => 'present',
 }
@@ -20,10 +21,9 @@ class{'ruby':
   version             => '2.0.0',
   set_system_default  => true,
 }
-class{'ruby::dev':
-  bundler_package   => 'bundler',
-  bundler_provider  => 'gem',
-}
+
+include ruby::dev
+
 
 include postgresql::server
 class {'postgresql::lib::devel':
@@ -38,6 +38,10 @@ class{'gitlab':
   gitlab_url    => 'http://localhost/',
   enable_https  => true,
   redirect_http => true,
+  gitlab_app_repo   => 'https://github.com/gitlabhq/gitlabhq.git',
+  gitlab_app_rev    => 'master',
+  gitlab_shell_repo => 'https://github.com/gitlabhq/gitlab-shell.git',
+  gitlab_shell_rev  => 'master',
   require       => [
     Class[
       'git',

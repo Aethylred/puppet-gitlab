@@ -23,6 +23,13 @@ There is a complete install [manifest example in the tests directory](tests/init
 * [**puppetlabs/ruby**](https://github.com/puppetlabs/puppetlabs-ruby) this module relies on a patches that are currently only in the master branch of the GitHub repository and not the version published at the Puppet Forge.
 * [**Aethylred/shibboleth**](https://github.com/Aethylred/puppet-shibboleth) this module is only required if the Shibboleth authentication is being used.
 
+## Packages
+
+The following packages are required to get GitLab installed. They're not installed directly by this module in case this interferes with them being managed or required by other modules.
+
+* `cmake`
+* `libicu-dev`
+
 # Classes
 
 This module provides a base `gitlab` class that will be used in most manifests. There are a number of private classes set up to reduce the complexity of the base class, however some may be of use in separating some of the functionality across different hosts, e.g. running the database on a separate host.

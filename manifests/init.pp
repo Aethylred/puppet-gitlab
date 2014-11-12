@@ -236,6 +236,16 @@ class gitlab (
     require => Class['gitlab::install'],
   }
 
+  file{'gitlab_resque_config':
+    ensure  => 'file',
+    path    => "${app_dir}/config/resque.yml",
+    owner   => $user,
+    group   => $user,
+    mode    => '0640',
+    content => template('gitlab/app/resque.yml.erb'),
+    require => Class['gitlab::install'],
+  }
+
   file{'gitlab_etc_default':
     ensure  => 'file',
     path    => '/etc/default/gitlab',
