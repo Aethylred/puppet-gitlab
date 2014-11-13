@@ -1,4 +1,6 @@
 # This file managed by Puppet, changes may be overwritten.
 development: redis://localhost:6379
 test: redis://localhost:6379
-production: unix:/var/run/redis/redis.sock
+production: redis://localhost:6379
+# redis module can't configure unix sockets
+# production: unix:/var/run/redis/redis.sock
