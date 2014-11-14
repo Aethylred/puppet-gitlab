@@ -305,6 +305,16 @@ class gitlab (
     require     => Ruby::Rake['gitlab_setup'],
   }
 
+  ruby::rake{'gitlab_import_repos':
+    task        => 'gitlab:import:repos',
+    environment => ["HOME=${user_home}"],
+    bundle      => true,
+    cwd         => $app_dir,
+    user        => $user,
+    refreshonly => true,
+    require     => Ruby::Rake['gitlab_setup'],
+  }
+
   service{'gitlab':
     ensure     => 'running',
     enable     => true,

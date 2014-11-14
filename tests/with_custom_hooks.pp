@@ -41,7 +41,7 @@ class{'gitlab':
   gitlab_app_repo   => 'https://github.com/gitlabhq/gitlabhq.git',
   gitlab_app_rev    => 'master',
   gitlab_shell_repo => 'https://github.com/gitlabhq/gitlab-shell.git',
-  gitlab_shell_rev  => '2.2.0',
+  gitlab_shell_rev  => 'v2.2.0',
   require       => [
     Class[
       'git',
@@ -52,4 +52,22 @@ class{'gitlab':
       'cmake'
     ]
   ]
+}
+
+# ssh_authorized_key{'git@git.local':
+#   user    => 'git',
+#   type    => 'ssh-rsa',
+#   options => [
+#     'command="/home/git/gitlab-shell/bin/gitlab-shell key-1"',
+#     'no-port-forwarding',
+#     'no-X11-forwarding',
+#     'no-agent-forwarding',
+#     'no-pty'
+#   ],
+#   key     => 'arillylonghash'
+# }
+
+gitlab::shell::repo{'a test':
+  group   => 'test',
+  project => 'testing'
 }
