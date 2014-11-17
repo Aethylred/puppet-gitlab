@@ -35,7 +35,7 @@ class {'postgresql::lib::devel':
 # Setting the gitlab_url used by gitlab shell to use localhost
 # because the FQDN of a test VM is unlikly to be real.
 class{'gitlab':
-  gitlab_url    => 'http://localhost/',
+  gitlab_url    => 'https://localhost/',
   enable_https  => true,
   redirect_http => true,
   gitlab_app_repo   => 'https://github.com/gitlabhq/gitlabhq.git',
@@ -70,4 +70,27 @@ class{'gitlab':
 gitlab::shell::repo{'a test':
   group   => 'test',
   project => 'testing'
+}
+
+# you need to login as an admin and add a user to this project to test these
+# scripts work when you push to the repository.
+
+gitlab::shell::repo::hook{'update':
+  target => 'a test',
+  content => "#!/bin/bash\necho 'this is a test of the update hook'\npwd\nsource ./custom_hooks/update-part2",
+}
+
+gitlab::shell::repo::hook{'update-part2':
+  target => 'a test',
+  content => "#!/bin/bash\necho 'this is a test of a chained update hook'",
+}
+
+gitlab::shell::repo::hook{'pre-receive':
+  target => 'a test',
+  content => "#!/bin/bash\necho 'this is a test of the pre-receive hook'",
+}
+
+gitlab::shell::repo::hook{'post-receive':
+  target => 'a test',
+  content => "#!/bin/bash\necho 'this is a test of the post-receive hook'",
 }

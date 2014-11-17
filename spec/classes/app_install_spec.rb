@@ -21,7 +21,7 @@ describe 'gitlab::install', :type => :class do
           'provider'  => 'git',
           'user'      => 'git',
           'source'    => 'https://gitlab.com/gitlab-org/gitlab-ce.git',
-          'revision'  => '7-3-stable',
+          'revision'  => '7-4-stable',
           'require'   => 'User[gitlab]'
         ) }
         it { should contain_file('gitlab_app_dir').with(

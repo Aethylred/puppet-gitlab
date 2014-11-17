@@ -54,7 +54,7 @@ describe 'gitlab', :type => :class do
         'user'              => 'git',
         'user_home'         => '/home/git',
         'repository'        => 'https://gitlab.com/gitlab-org/gitlab-shell.git',
-        'revision'          => 'v2.0.0',
+        'revision'          => 'v2.0.1',
         'repository_dir'    => '/home/git/repositories',
         'auth_file'         => '/home/git/.ssh/authorized_keys',
         'selfsigned_certs'  => true,
@@ -73,7 +73,7 @@ describe 'gitlab', :type => :class do
       it { should contain_class('gitlab::install').with(
         'app_dir'     => '/home/git/gitlab',
         'repository'  => 'https://gitlab.com/gitlab-org/gitlab-ce.git',
-        'revision'    => '7-3-stable',
+        'revision'    => '7-4-stable',
         'user'        => 'git'
       ) }
       it { should contain_file('gitlab_app_config').with(

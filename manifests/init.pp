@@ -88,6 +88,7 @@ class gitlab (
   }
 
   $repository_dir = "${user_home}/repositories"
+  $satellites_dir = "${user_home}/gitlab-satellites"
   $auth_file      = "${user_home}/.ssh/authorized_keys"
   if $gitlab_app_dir {
     $app_dir = $gitlab_app_dir
@@ -157,6 +158,16 @@ class gitlab (
     owner   => $user,
     group   => $user,
     mode    => '2770',
+    recurse => true,
+  }
+
+  file{'gitlab_satellites_dir':
+    ensure  => 'directory',
+    path    => $satellites_dir,
+    owner   => $user,
+    group   => $user,
+    mode    => '0750',
+    ignore  => ['.git'],
     recurse => true,
   }
 

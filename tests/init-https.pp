@@ -35,7 +35,7 @@ class {'postgresql::lib::devel':
 # Setting the gitlab_url used by gitlab shell to use localhost
 # because the FQDN of a test VM is unlikly to be real.
 class{'gitlab':
-  gitlab_url    => 'http://localhost/',
+  gitlab_url    => 'https://localhost/',
   enable_https  => true,
   redirect_http => true,
   require       => [
