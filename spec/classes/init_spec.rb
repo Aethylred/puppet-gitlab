@@ -39,8 +39,15 @@ describe 'gitlab', :type => :class do
         'path'    => '/home/git/repositories',
         'owner'   => 'git',
         'group'   => 'git',
-        'mode'    => '2770',
-        'recurse' => true
+        'mode'    => '2770'
+      ) }
+      it { should contain_file('gitlab_satellites_dir').with(
+        'ensure'  => 'directory',
+        'path'    => '/home/git/gitlab-satellites',
+        'owner'   => 'git',
+        'group'   => 'git',
+        'mode'    => '0750',
+        'ignore'  => ['.git']
       ) }
       it { should contain_file('gitlab_auth_file').with(
         'ensure'  => 'file',
@@ -119,6 +126,15 @@ describe 'gitlab', :type => :class do
         'option'  => '--deployment --path=vendor/bundle --without test development mysql aws',
         'cwd'     => '/home/git/gitlab',
         'user'    => 'git'
+      ) }
+      it { should contain_ruby__rake('gitlab_import_repos').with(
+        'task'        => 'gitlab:import:repos',
+        'environment' => ['HOME=/home/git'],
+        'bundle'      => true,
+        'refreshonly' => true,
+        'cwd'         => '/home/git/gitlab',
+        'user'        => 'git',
+        'require'     => ['Ruby::Rake[gitlab_setup]','Class[Ruby]']
       ) }
       it { should contain_ruby__rake('gitlab_setup').with(
         'task'        => 'gitlab:setup',
@@ -382,6 +398,11 @@ describe 'gitlab', :type => :class do
       it { should contain_ruby__bundle('gitlab_install').with(
         'cwd'     => '/path/to/home/gitlab',
         'user'    => 'nobody'
+      ) }
+      it { should contain_ruby__rake('gitlab_import_repos').with(
+        'environment' => ['HOME=/path/to/home'],
+        'cwd'         => '/path/to/home/gitlab',
+        'user'        => 'nobody'
       ) }
       it { should contain_ruby__rake('gitlab_setup').with(
         'environment' => ['force=yes','HOME=/path/to/home'],
@@ -916,12 +937,10 @@ describe 'gitlab', :type => :class do
         :fqdn                   => 'test.example.org',
       }
     end
-    it {
-      should raise_error(Puppet::Error, /The GitLab Puppet module does not support RedHat family of operating systems/)
-    }
+    it { should raise_error(Puppet::Error, /The GitLab Puppet module does not support RedHat family of operating systems/) }
   end
 
-    context 'on an Unknown OS' do
+  context 'on an Unknown OS' do
     let :facts do
       {
         :osfamily               => 'Unknown',
@@ -930,9 +949,7 @@ describe 'gitlab', :type => :class do
         :fqdn                   => 'test.example.org',
       }
     end
-    it {
-      should raise_error(Puppet::Error, /The GitLab Puppet module does not support Unknown family of operating systems/)
-    }
+    it { should raise_error(Puppet::Error, /The GitLab Puppet module does not support Unknown family of operating systems/) }
   end
 
 end

@@ -5,8 +5,8 @@ define gitlab::shell::repo (
 ) {
 
   validate_string($group,$project)
-  validate_re($group,'^[a-zA-Z0-9]*$')
-  validate_re($project,'^[a-zA-Z0-9]*$')
+  validate_re($group,'^[a-z]([a-zA-Z0-9_-]*)$')
+  validate_re($project,'^[a-z]([a-zA-Z0-9_-]*)$')
   $repo_name = "${group}/${project}.git"
   $repo_path = "${gitlab::repository_dir}/${repo_name}"
 

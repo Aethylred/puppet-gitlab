@@ -153,22 +153,20 @@ class gitlab (
   }
 
   file{'gitlab_repostiories_dir':
-    ensure  => 'directory',
-    path    => $repository_dir,
-    owner   => $user,
-    group   => $user,
-    mode    => '2770',
-    recurse => true,
+    ensure => 'directory',
+    path   => $repository_dir,
+    owner  => $user,
+    group  => $user,
+    mode   => '2770',
   }
 
   file{'gitlab_satellites_dir':
-    ensure  => 'directory',
-    path    => $satellites_dir,
-    owner   => $user,
-    group   => $user,
-    mode    => '0750',
-    ignore  => ['.git'],
-    recurse => true,
+    ensure => 'directory',
+    path   => $satellites_dir,
+    owner  => $user,
+    group  => $user,
+    mode   => '0750',
+    ignore => ['.git'],
   }
 
   file{'gitlab_auth_file':

@@ -7,6 +7,10 @@ define gitlab::shell::repo::hook (
   $source  = undef
 ) {
 
+  # To Do: A version check may be required,
+  # that will involve exposing the Gitlab & Gitlab shell version
+  # as a fact
+
   validate_re($path, '^[a-z]([a-zA-Z0-9_-]*)$')
 
   $repo_group   = getparam(Gitlab::Shell::Repo[$target], 'group')
