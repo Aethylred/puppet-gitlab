@@ -302,9 +302,11 @@ describe 'gitlab', :type => :class do
       it { should contain_file('gitlab_app_rb_config').with_content(
         %r{^    # config.relative_url_root = "/gitlab"$}
       ) }
-      # Verify contents of gitlab_app_rb_config
       it { should contain_file('gitlab_app_rb_config').without_content(
         %r{^    config.relative_url_root = .*$}
+      ) }
+      it { should contain_file('gitlab_app_rb_config').without_content(
+        %r{^    config.time_zone = .*$}
       ) }
       # Verify contents of gitlab_etc_default
       it { should contain_file('gitlab_etc_default').with_content(
@@ -470,6 +472,24 @@ describe 'gitlab', :type => :class do
         'audit_usernames'   => true,
         'log_level'         => 'WARN',
         'gl_shell_logfile'  => '/path/to/log'
+      ) }
+    end
+    describe 'when given parameters that configure the Ruby application' do
+      let :params do
+        {
+          :relative_url_root => '/git',
+          :time_zone         => 'Pacific/Auckland',
+        }
+      end
+      # Verify contents of gitlab_app_rb_config
+      it { should contain_file('gitlab_app_rb_config').without_content(
+        %r{^    # config.relative_url_root = "/gitlab"$}
+      ) }
+      it { should contain_file('gitlab_app_rb_config').with_content(
+        %r{^    config.relative_url_root = "/git"}
+      ) }
+      it { should contain_file('gitlab_app_rb_config').with_content(
+        %r{^    config.time_zone = 'Pacific/Auckland'$}
       ) }
     end
     describe 'when given database configuration details' do

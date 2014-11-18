@@ -42,6 +42,7 @@ class{'gitlab':
   gitlab_app_rev    => 'master',
   gitlab_shell_repo => 'https://github.com/gitlabhq/gitlab-shell.git',
   gitlab_shell_rev  => 'v2.2.0',
+  time_zone         => 'Pacific/Auckland',
   require       => [
     Class[
       'git',

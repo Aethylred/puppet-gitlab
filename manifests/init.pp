@@ -73,7 +73,8 @@ class gitlab (
   $block_auto_create      = true,
   $shibboleth             = false,
   $signup_enabled         = false,
-  $signin_enabled         = true
+  $signin_enabled         = true,
+  $time_zone              = undef
 ) inherits gitlab::params {
 
   require redis
