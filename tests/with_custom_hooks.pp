@@ -39,7 +39,7 @@ class{'gitlab':
   enable_https  => true,
   redirect_http => true,
   gitlab_app_repo   => 'https://github.com/gitlabhq/gitlabhq.git',
-  gitlab_app_rev    => 'master',
+  gitlab_app_rev    => '7-5-stable',
   gitlab_shell_repo => 'https://github.com/gitlabhq/gitlab-shell.git',
   gitlab_shell_rev  => 'v2.2.0',
   time_zone         => 'Pacific/Auckland',

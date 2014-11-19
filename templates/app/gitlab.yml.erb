@@ -23,6 +23,14 @@ production: &base
     <%- end -%>
     user: <%= @user %>
 
+    ## Date & Time settings
+    # Uncomment and customize if you want to change the default time zone of GitLab application.
+    # To see all available zones, run `bundle exec rake time:zones:all`
+    # time_zone: 'UTC'
+    <%- if @time_zone -%>
+    time_zone: '<%= @time_zone %>'
+    <%- end -%>
+
     ## Email settings
     email_from: <%= @real_email %>
     # Email server smtp settings are in [a separate file](initializers/smtp_settings.rb.sample).

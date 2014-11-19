@@ -207,6 +207,9 @@ describe 'gitlab', :type => :class do
       it { should contain_file('gitlab_app_config').without_content(
         %r{^    relative_url_root: .*$}
       ) }
+      it { should contain_file('gitlab_app_config').without_content(
+        %r{^    time_zone: .*$}
+      ) }
       it { should contain_file('gitlab_app_config').with_content(
         %r{^    user: git$}
       ) }
@@ -490,6 +493,9 @@ describe 'gitlab', :type => :class do
       ) }
       it { should contain_file('gitlab_app_rb_config').with_content(
         %r{^    config.time_zone = 'Pacific/Auckland'$}
+      ) }
+      it { should contain_file('gitlab_app_config').with_content(
+        %r{^    time_zone: 'Pacific/Auckland'$}
       ) }
     end
     describe 'when given database configuration details' do
