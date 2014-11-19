@@ -82,6 +82,9 @@ This module provides a base `gitlab` class that will be used in most manifests. 
 * *allow_sso* If set to true, this will allow GitLab to create users from SSO/OmniAuth logins. The default is false.
 * *block_auto_create* If set to true, users created by SSO/OmniAuth logins will need to be approved by an administrator before they can do anything. The default is true.
 * *shibboleth* If sets to true this configures GitLab to use the Shibboleth OmniAuth provider. See the section on [Shibboleth](#Shibboleth) for details.
+* *signup_enabled* If set to `true` this will allow users to create new accounts via the login screen, otherwise all accounts must be created by the site Administrators. The default is `false`.
+* *signin_enabled* If set to `false` this will require users to use one of the OmniAuth providers instead of being able to log in with a username and password. The default is `true`. **NOTE**: this needs to be `true` to log in with the default administrator account and do the initial set up of the Gitlab application and to appoint new administrators.
+* *time_zone* This sets the time zone that the Gitlab application runs in, dates and time will be displayed relative to this time zone. Run "rake -D time" for a list of tasks for finding time zone names. The default is undefined, which will use the UTC.
 
 #### Using the OmniAuth parameter
 
@@ -93,7 +96,7 @@ Currently the list of supported providers is:
 - Twitter (`twitter`)
 - Shibboleth (no provider, has it's own parameter)
 
-**NOTE:** if the `allow_sso` is true and `block_auto_create` is false, then anyone with an identity on any of the configured OmniAuth providers can log in and use the GitLab instance.
+**NOTE:** if the `allow_sso` is true and `block_auto_create` is false, then anyone with an identity on any of the configured OmniAuth providers can log in and use the GitLab instance, which includes access to internal projects.
 
 #### Shibboleth
 
@@ -147,10 +150,38 @@ Runs the install procedure to install the GitLab command line shell, allowing it
 * *log_level* this sets the logging level of the GitLab shell. The default is `INFO`
 * *gl_shell_logfile* this sets the path to the GitLab shell log file.
 
+## Defined Resources
+
+### gitlab::shell::repo
+
+This resources uses the Gitlab shell to create a repository and import it into the Gitlab application. If the repository's group or user does not exist, a new group will be created to host the repository. If the repository already exist, Puppet remains idempotent and does nothing but acknowledge it's existence. Ownership of the repository is assigned to the first administrator, which will usually be the default administrator. Any administrator should be able to reassign ownership of the repository or move it into another namespace. This resource is a bit clumsy, and not the best way to create repositories, but it does make Puppet aware that a repository exist regardless of whether Puppet created it a not and was a prerequisite for managing repository hook scripts.
+
+#### Parameters
+
+* *group*: This is the group or user under which the repository will be created. If no group or user exists in the Gitlab instance with this name a group will be created with the first administrator as the owner. This is a required parameter with no default value.
+* *project*: This is the name of the repository to be created under the group defined by the `group` parameter. The owner will be the first administrator. This is a required parameter with no default value.
+
+### gitlab::shell::repo::hook
+
+This resource creates a [Git server-side hook script](http://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks#Server-Side-Hooks) that will be executed at different stages through pushing a git commit to the target repository. Creation of hooks requires that the repository be previously defined in the Puppet manifest. These hooks are not currently visible in the Gitlab web application. These hook scripts should follow the [Gitlab custom hook guidelines](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/hooks/custom_hooks.md).
+
+The repository must be declared as a resource with `gitlab::shell::repo`.
+
+**NOTE:** This resource requires [Gitlab shell v2.2.0 or later](https://gitlab.com/gitlab-org/gitlab-shell/tree/v2.2.0) which has the custom hook scripts feature.
+
+There are examples of how these scripts should be declared in the [test scripts](tests/with_custom_hooks.pp)
+
+One of, but not both, `content` or `source` is required. If both, or none of, the `content` or `source` parameters are defined an error will be thrown.
+
+#### Parameters
+
+* *target*: This is the name of the target repository as defined when declared with `gitlab::shell::repo`. This parameter is required and has no default value.
+* *path*: this is an the name of the hook script file, this is set to the `name` of the resource by default. Git only executes scripts with the name `pre-recieve`, `update`, or `post-recieve`, scripts with other names or paths will need to be explicitly called by a recognised script.
+* *content*: The content of the hook script will be set to the value passed via this parameter, similar to the standard Puppet `file` resource. One of, but not both, `content` or `source` is required. The default is undefined.
+* *source*: The hook script will be copied from this location similar to the standard Puppet `file` resource. One of, but not both, `content` or `source` is required. The default is undefined.
+
 # To Do
 
-* Create repositories.
-* Inject hook scripts into repositories.
 * Figure out icons for custom OmniAuth providers ([check ticket](http://feedback.gitlab.com/forums/176466-general/suggestions/5228989-allow-icons-for-custom-omniauth-providers))
 
 # References
