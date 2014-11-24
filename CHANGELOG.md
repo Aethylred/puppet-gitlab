@@ -1,5 +1,20 @@
 # Releases
 
+##0.5.2
+- Set core.autocrlf git config for the gitlab user
+
+##0.5.1
+- Set time zone in gitlab.yml
+
+##0.5.0
+- Set Time Zone
+- New resources:
+  - gitlab::shell::repo to define repositories
+  - gitlab::shell::repo::hook to define hook scripts
+- Create satellite directory
+- Some permissions tuning
+- Fix I18 localisation warnings
+
 ##0.4.0
 - Shibboleth OmniAuth.
 

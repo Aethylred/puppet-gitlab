@@ -145,6 +145,13 @@ class gitlab (
     require    => User['gitlab'],
   }
 
+  git::config{'git_core_autocrlf':
+    config   => 'core.autocrlf',
+    value    => 'input',
+    provider => 'global',
+    user     => $user
+  }
+
   file{'gitlab_home':
     ensure  => 'directory',
     path    => $user_home,

@@ -180,6 +180,20 @@ One of, but not both, `content` or `source` is required. If both, or none of, th
 * *content*: The content of the hook script will be set to the value passed via this parameter, similar to the standard Puppet `file` resource. One of, but not both, `content` or `source` is required. The default is undefined.
 * *source*: The hook script will be copied from this location similar to the standard Puppet `file` resource. One of, but not both, `content` or `source` is required. The default is undefined.
 
+# Issues
+
+When running the `gitlab:check` rake command to verify the Gitlab installation, it should all be correct with the exception of the init script check. This is correct behaviour as this module deploys it's own init script customised to work with Apache, so has all the Unicorn parts removed.
+
+Hence, the following output is expected and no corrective action should be taken.
+```
+Init script up-to-date? ... no
+  Try fixing it:
+  Redownload the init script
+  For more information see:
+  doc/install/installation.md in section "Install Init Script"
+  Please fix the error above and rerun the checks.
+```
+
 # To Do
 
 * Figure out icons for custom OmniAuth providers ([check ticket](http://feedback.gitlab.com/forums/176466-general/suggestions/5228989-allow-icons-for-custom-omniauth-providers))

@@ -11,65 +11,71 @@ describe 'gitlab::shell::repo::hook', :type => :define do
     end
     describe 'with default gitlab and a test repo' do
       let :pre_condition do
-        "include gitlab\ninclude redis\ninclude apache\nclass gitlab::shell::repo{'test': group 
+        "include gitlab\ninclude redis\ninclude apache\ngitlab::shell::repo{'test': group 
         =>'test_group', project => 'test_project'}"
       end
       describe 'when provided content' do
         let :title do
-          'atest'
+          'the_hook'
         end
         let :params do
           {
             :target  => 'test',
             :content => 'this is a test'
           }
-          it { should contain_file('test_hook_atest').with(
-            'ensure'  => 'file',
-            'path'    => $hook_path,
-            'owner'   => 'git',
-            'group'   => 'git',
-            'mode'    => '0750',
-            'content' => 'this is a test',
-            'require' => ['File[/home/git/repositories/test_group/test_project.git/custom_hooks]','Gitlab::Shell::Repo[test]']
-          ) }
-          it { should contain_file('test_hook_atest').without('source') }
         end
+        it { should contain_file('test_hook_the_hook').with(
+          'ensure'  => 'file',
+          'path'    => '/home/git/repositories/test_group/test_project.git/custom_hooks/the_hook',
+          'owner'   => 'git',
+          'group'   => 'git',
+          'mode'    => '0750',
+          'content' => 'this is a test',
+          'require' => [
+            'File[/home/git/repositories/test_group/test_project.git/custom_hooks]',
+            'Gitlab::Shell::Repo[test]'
+          ]
+        ) }
+        it { should contain_file('test_hook_the_hook').without('source') }
       end
       describe 'when provided a source' do
         let :title do
-          'atest'
+          'the_hook'
         end
         let :params do
           {
             :target => 'test',
             :source => '/path/to/file'
           }
-          it { should contain_file('test_hook_atest').with(
-            'ensure'  => 'file',
-            'path'    => $hook_path,
-            'owner'   => 'git',
-            'group'   => 'git',
-            'mode'    => '0750',
-            'source'  => '/path/to/file',
-            'require' => ['File[/home/git/repositories/test_group/test_project.git/custom_hooks]','Gitlab::Shell::Repo[test]']
-          ) }
-          it { should contain_file('test_hook_atest').without('content') }
         end
+        it { should contain_file('test_hook_the_hook').with(
+          'ensure'  => 'file',
+          'path'    => '/home/git/repositories/test_group/test_project.git/custom_hooks/the_hook',
+          'owner'   => 'git',
+          'group'   => 'git',
+          'mode'    => '0750',
+          'source'  => '/path/to/file',
+          'require' => [
+            'File[/home/git/repositories/test_group/test_project.git/custom_hooks]',
+            'Gitlab::Shell::Repo[test]'
+          ]
+        ) }
+        it { should contain_file('test_hook_the_hook').without('content') }
       end
       describe 'when not provided source or content' do
         let :title do
-          'atest'
+          'the_hook'
         end
         let :params do
           {
             :target => 'test'
           }
-          it { should raise_error(Puppet::Error, /gitlab::shell::repo::hook requires a content or source parameter, but niether have been provided/) }
         end
+        it { should raise_error(Puppet::Error, /gitlab::shell::repo::hook requires a content or source parameter, but niether have been provided/) }
       end
       describe 'when provided both source or content' do
         let :title do
-          'atest'
+          'the_hook'
         end
         let :params do
           {
@@ -77,8 +83,8 @@ describe 'gitlab::shell::repo::hook', :type => :define do
             :source  => '/path/to/file',
             :content => 'this is a test'
           }
-          it { should raise_error(Puppet::Error, /gitlab::shell::repo::hook requires only one of content or source parameter, but not both/) }
         end
+        it { should raise_error(Puppet::Error, /gitlab::shell::repo::hook requires only one of content or source parameter, but not both/) }
       end
     end
   end

@@ -18,11 +18,11 @@ describe 'gitlab::shell::repo', :type => :define do
           'test'
         end
         let :params do
-        {
-          :group   => 'test_group',
-          :project => 'a_project'
-        }
-      end
+          {
+            :group   => 'test_group',
+            :project => 'a_project'
+          }
+        end
         it { should contain_exec('create_gitlab_shell_repo_test').with(
           'command'     => '/home/git/gitlab-shell/bin/gitlab-projects add-project test_group/a_project.git',
           'user'        => 'git',

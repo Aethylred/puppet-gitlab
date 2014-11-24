@@ -27,6 +27,12 @@ describe 'gitlab', :type => :class do
         'user_name'   => 'GitLab',
         'user_email'  => 'git@test.example.org'
       ) }
+      it { should contain_git__config('git_core_autocrlf').with(
+        'config'   => 'core.autocrlf',
+        'value'    => 'input',
+        'provider' => 'global',
+        'user'     => 'git'
+      ) }
       it { should contain_file('gitlab_home').with(
         'ensure'  => 'directory',
         'path'    => '/home/git',
@@ -355,6 +361,9 @@ describe 'gitlab', :type => :class do
       ) }
       it { should contain_git__user('nobody').with(
         'user_email'  => 'nobody@test.example.org'
+      ) }
+      it { should contain_git__config('git_core_autocrlf').with(
+        'user'     => 'nobody'
       ) }
       it { should contain_file('gitlab_home').with(
         'path'    => '/path/to/home',

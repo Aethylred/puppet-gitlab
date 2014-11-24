@@ -20,7 +20,7 @@ fixtures:
       ref:  '0.3.0'
     git:
       repo: 'Aethylred-git'
-      ref:  '0.1.2'
+      ref:  '0.3.1'
     redis:
       repo: 'thomasvandoren-redis'
       ref:  '0.10.0'
