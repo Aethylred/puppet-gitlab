@@ -1,6 +1,6 @@
 {
   "name": "Aethylred-gitlab",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "author": "Aaron Hicks",
   "license": "Licensed under GPL3",
   "summary": "A module for installing and managing GitLab with Apache",

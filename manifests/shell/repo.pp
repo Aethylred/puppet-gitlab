@@ -13,6 +13,7 @@ define gitlab::shell::repo (
   exec{"create_gitlab_shell_repo_${name}":
     command     => "${gitlab::user_home}/gitlab-shell/bin/gitlab-projects add-project ${repo_name}",
     user        => $gitlab::user,
+    cwd         => $gitlab::user_home,
     creates     => $repo_path,
     environment => ['RAILS_ENV=production'],
     notify      => Ruby::Rake['gitlab_import_repos'],

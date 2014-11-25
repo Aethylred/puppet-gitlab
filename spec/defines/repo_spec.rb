@@ -26,6 +26,7 @@ describe 'gitlab::shell::repo', :type => :define do
         it { should contain_exec('create_gitlab_shell_repo_test').with(
           'command'     => '/home/git/gitlab-shell/bin/gitlab-projects add-project test_group/a_project.git',
           'user'        => 'git',
+          'cwd'         => '/home/git',
           'creates'     => '/home/git/repositories/test_group/a_project.git',
           'environment' => ['RAILS_ENV=production'],
           'notify'      => 'Ruby::Rake[gitlab_import_repos]',

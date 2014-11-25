@@ -1,5 +1,8 @@
 # Releases
 
+##0.5.3
+- Now tries to create new repos from the git user's home directory
+
 ##0.5.2
 - Set core.autocrlf git config for the gitlab user
 
