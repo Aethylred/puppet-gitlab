@@ -11,7 +11,7 @@ define gitlab::shell::repo::hook (
   # that will involve exposing the Gitlab & Gitlab shell version
   # as a fact
 
-  validate_re($path, '^[a-z]([a-zA-Z0-9_-]*)$')
+  validate_re($path, '^[a-z]([a-zA-Z0-9_\-\.\/]*)$')
 
   $repo_group   = getparam(Gitlab::Shell::Repo[$target], 'group')
   $repo_project = getparam(Gitlab::Shell::Repo[$target], 'project')
