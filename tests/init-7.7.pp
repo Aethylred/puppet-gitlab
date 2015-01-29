@@ -4,6 +4,11 @@ class{'git': }
 package{'libicu-dev':
   ensure => 'present',
 }
+
+package{'libkrb5-dev':
+  ensure => 'present',
+}
+
 package{'cmake':
   ensure => 'present',
 }
@@ -33,6 +38,10 @@ class {'postgresql::lib::devel':
 # because the FQDN of a test VM is unlikly to be real.
 class{'gitlab':
   gitlab_url  => 'http://localhost/',
+  gitlab_app_repo   => 'https://github.com/gitlabhq/gitlabhq.git',
+  gitlab_app_rev    => '7-7-stable',
+  gitlab_shell_repo => 'https://github.com/gitlabhq/gitlab-shell.git',
+  gitlab_shell_rev  => 'v2.4.1',
   require     => [
     Class[
       'git',
@@ -40,7 +49,8 @@ class{'gitlab':
     ],
     Package[
       'libicu-dev',
-      'cmake'
+      'cmake',
+      'libkrb5-dev'
     ]
   ]
 }

@@ -8,9 +8,87 @@ This Puppet module installs, manages and configures the [GitLab](http://gitlab.o
 
 As GitLab requires Ruby 2.0.0 this module has been developed to work on Ubuntu 14.04LTS which uses this as it's natural Ruby version. Work has been done to try and make it work with Ubuntu 12.04LTS, but runs into issues getting the gems installed correctly.
 
+# Supported Gitlab Versions
+
+This module has been used on:
+
+* Gitlab 6.5 Stable
+* Gitlab 7.5 Stable
+* Gitlab 7.7 Stable
+
 # Usage
 
-There is a complete install [manifest example in the tests directory](tests/init.pp).
+There is a complete install [manifest example in the tests directory](tests/init.pp). An updated version for [Gitlab 7.7 is also provided](tests/init-7.7.pp).
+
+# Upgrading Gitlab
+
+The upgrade process is semi-automated, this ensures that the Gitlab application state is not lost.
+
+1. Before upgrading stop Gitlab.
+
+    ```
+    $ service apache2 stop
+    $ service gitlab stop
+    ```
+
+1. Back up Gitlab:
+
+    ```
+    cd /home/git/gitlab
+    sudo -u git -H bundle exec rake gitlab:backup:create RAILS_ENV=production
+    ```
+
+1. On the puppetmaster edit the Puppet Manifest for gitlab, and include new version references and update package dependencies if required:
+
+    ```puppet
+    class{'gitlab':
+      gitlab_url  => 'http://localhost/',
+      gitlab_app_rev    => '7-7-stable',
+      gitlab_shell_rev  => 'v2.4.1',
+      require     => [
+        Class[
+          'git',
+          'postgresql::lib::devel'
+        ],
+        Package[
+          'libicu-dev',
+          'cmake',
+          'libkrb5-dev'
+        ]
+      ]
+    }
+    ```
+
+1. On the Gitlab server, run puppet to update the application, and dependencies.
+
+    ```
+    puppet agent -t
+    ```
+
+1. This will reassert the Gitlab service, stop it again.
+
+    ```
+    $ service apache2 stop
+    $ service gitlab stop
+    ```
+
+1. Migrate database:
+
+    ```
+    sudo -u git -H bundle exec rake db:migrate RAILS_ENV=production
+    ```
+
+1. Clean up assets and cache:
+
+    ```
+    sudo -u git -H bundle exec rake assets:clean assets:precompile cache:clear RAILS_ENV=production
+    ```
+
+1. Use puppet to restart services and check everything:
+
+    ```
+    puppet agent -t
+    ```
 
 # Dependencies
 
@@ -29,6 +107,10 @@ The following packages are required to get GitLab installed. They're not install
 
 * `cmake`
 * `libicu-dev`
+
+For Gitlab 7.7 and later the Kerberos development libraries are also required:
+
+* `libkrb5-dev`
 
 # Classes
 

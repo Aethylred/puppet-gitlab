@@ -129,7 +129,7 @@ describe 'gitlab', :type => :class do
       ) }
       it { should contain_ruby__bundle('gitlab_install').with(
         'command' => 'install',
-        'option'  => '--deployment --path=vendor/bundle --without test development mysql aws',
+        'option'  => '--deployment --path=vendor/bundle --without test development mysql aws unicorn',
         'cwd'     => '/home/git/gitlab',
         'user'    => 'git'
       ) }

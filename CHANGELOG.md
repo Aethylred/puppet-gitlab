@@ -1,5 +1,15 @@
 # Releases
 
+##0.5.6
+- Minimum changes for Gitlab 7.7 and Gitlab Shell 2.4
+- Document upgrade process
+
+##0.5.5
+- Fix shib_request_settings (it's plural)
+
+##0.5.4
+- Update hook path to allow paths and not just a file
+
 ##0.5.3
 - Now tries to create new repos from the git user's home directory
 

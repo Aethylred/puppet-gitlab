@@ -283,12 +283,12 @@ class gitlab (
 
   ruby::bundle{'gitlab_install':
     command     => 'install',
-    option      => '--deployment --path=vendor/bundle --without test development mysql aws',
+    option      => '--deployment --path=vendor/bundle --without test development mysql aws unicorn',
     environment => ["HOME=${user_home}"],
     cwd         => $app_dir,
     user        => $user,
     # multicore   => '0',
-    timeout     => '600',
+    timeout     => '1200',
     require     => [
       File['gitlab_db_config','gitlab_app_config']
     ]
