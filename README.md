@@ -22,7 +22,9 @@ There is a complete install [manifest example in the tests directory](tests/init
 
 # Upgrading Gitlab
 
-The upgrade process is semi-automated, this ensures that the Gitlab application state is not lost.
+The upgrade process is a WORK IN PROGRESS! Don't do it.
+
+...the puppet manifest creates a new database, rather than updating it, which drops everything. (also, yay for test servers that caught this before going into production)
 
 1. Before upgrading stop Gitlab.
 
@@ -59,18 +61,7 @@ The upgrade process is semi-automated, this ensures that the Gitlab application 
     }
     ```
 
-1. On the Gitlab server, run puppet to update the application, and dependencies.
-
-    ```
-    puppet agent -t
-    ```
-
-1. This will reassert the Gitlab service, stop it again.
-
-    ```
-    $ service apache2 stop
-    $ service gitlab stop
-    ```
+1. No don't do that.
 
 1. Migrate database:
 
