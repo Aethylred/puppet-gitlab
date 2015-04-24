@@ -20,7 +20,7 @@ describe 'gitlab::shell::install', :type => :class do
           'path'      => '/home/git/gitlab-shell',
           'provider'  => 'git',
           'user'      => 'git',
-          'source'    => 'https://gitlab.com/gitlab-org/gitlab-shell.git',
+          'source'    => 'https://github.com/gitlabhq/gitlab-shell.git',
           'revision'  => 'v2.0.1',
           'require'   => 'User[gitlab]'
         ) }
