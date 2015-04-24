@@ -1,5 +1,9 @@
 # Releases
 
+##0.5.7
+- Update metadata as the Puppetlabs Apache module version 1.4.0 is not compatible.
+- Try to reduce runtime by ignoring some directories under recursive management
+
 ##0.5.6
 - Minimum changes for Gitlab 7.7 and Gitlab Shell 2.4
 - Document upgrade process

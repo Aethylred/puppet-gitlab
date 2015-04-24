@@ -21,6 +21,7 @@ class gitlab::install (
     ensure  => 'directory',
     path    => $app_dir,
     owner   => $user,
+    ignore  => ['.git','vendor'],
     recurse => true,
     require => Vcsrepo['gitlab_app']
   }
