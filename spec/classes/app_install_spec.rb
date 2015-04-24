@@ -20,7 +20,7 @@ describe 'gitlab::install', :type => :class do
           'path'      => '/home/git/gitlab',
           'provider'  => 'git',
           'user'      => 'git',
-          'source'    => 'https://gitlab.com/gitlab-org/gitlab-ce.git',
+          'source'    => 'https://github.com/gitlabhq/gitlabhq.git',
           'revision'  => '7-4-stable',
           'require'   => 'User[gitlab]'
         ) }
@@ -28,6 +28,7 @@ describe 'gitlab::install', :type => :class do
           'ensure'  => 'directory',
           'path'    => '/home/git/gitlab',
           'owner'   => 'git',
+          'ignore'  => ['.git','vendor'],
           'recurse' => true,
           'require' => 'Vcsrepo[gitlab_app]'
         ) }

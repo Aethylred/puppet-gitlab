@@ -66,7 +66,7 @@ describe 'gitlab', :type => :class do
         'gitlab_url'        => 'http://test.example.org/',
         'user'              => 'git',
         'user_home'         => '/home/git',
-        'repository'        => 'https://gitlab.com/gitlab-org/gitlab-shell.git',
+        'repository'        => 'https://github.com/gitlabhq/gitlab-shell.git',
         'revision'          => 'v2.0.1',
         'repository_dir'    => '/home/git/repositories',
         'auth_file'         => '/home/git/.ssh/authorized_keys',
@@ -85,7 +85,7 @@ describe 'gitlab', :type => :class do
       )}
       it { should contain_class('gitlab::install').with(
         'app_dir'     => '/home/git/gitlab',
-        'repository'  => 'https://gitlab.com/gitlab-org/gitlab-ce.git',
+        'repository'  => 'https://github.com/gitlabhq/gitlabhq.git',
         'revision'    => '7-4-stable',
         'user'        => 'git'
       ) }
