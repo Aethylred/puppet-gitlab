@@ -1,7 +1,7 @@
 require 'spec_helper'
 describe 'gitlab', :type => :class do
   on_supported_os.each do |os, facts|
-    if os != 'ubuntu-14.04-x86_64' then next end
+    # if os != 'ubuntu-14.04-x86_64' then next end
     context "on #{os}" do
       let(:facts) do
         facts.merge({
@@ -961,18 +961,6 @@ describe 'gitlab', :type => :class do
         ) }
       end
     end
-  end
-
-  context 'on a RedHat OS' do
-    let :facts do
-      {
-        :osfamily               => 'RedHat',
-        :operatingsystemrelease => '6',
-        :concat_basedir         => '/dne',
-        :fqdn                   => 'test.example.org',
-      }
-    end
-    it { should raise_error(Puppet::Error, /The GitLab Puppet module does not support RedHat family of operating systems/) }
   end
 
   context 'on an Unknown OS' do
