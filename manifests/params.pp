@@ -9,8 +9,18 @@ class gitlab::params {
   $db_name            = 'gitlab'
 
   case $::osfamily {
-    Debian:{
+    'Debian':{
       # Do nothing
+    }
+    'RedHat':{
+      case $::operatingsystem {
+        'RedHat', 'CentOS':  {
+          # Do nothing
+        }
+        default:{
+          fail("The GitLab Puppet module only supports RedHat or CentOS from the ${::osfamily} family of operating systems")
+        }
+      }
     }
     default:{
       fail("The GitLab Puppet module does not support ${::osfamily} family of operating systems")
