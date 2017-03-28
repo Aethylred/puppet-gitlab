@@ -10,16 +10,16 @@ package{'cmake':
 }
 
 class{'apache':
-  default_vhost     => false,
-  server_signature  => 'off',
-  log_formats       => { common_forwarded => '%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b'},
+  default_vhost    => false,
+  server_signature => 'off',
+  log_formats      => { common_forwarded => '%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b'},
 }
 include apache::mod::passenger
 include redis
 
 class{'ruby':
-  version             => '2.0.0',
-  set_system_default  => true,
+  version            => '2.0.0',
+  set_system_default => true,
 }
 
 include ruby::dev
@@ -35,15 +35,15 @@ class {'postgresql::lib::devel':
 # Setting the gitlab_url used by gitlab shell to use localhost
 # because the FQDN of a test VM is unlikly to be real.
 class{'gitlab':
-  gitlab_url    => 'https://localhost/',
-  enable_https  => true,
-  redirect_http => true,
+  gitlab_url        => 'https://localhost/',
+  enable_https      => true,
+  redirect_http     => true,
   gitlab_app_repo   => 'https://github.com/gitlabhq/gitlabhq.git',
   gitlab_app_rev    => '7-5-stable',
   gitlab_shell_repo => 'https://github.com/gitlabhq/gitlab-shell.git',
   gitlab_shell_rev  => 'v2.2.0',
   time_zone         => 'Pacific/Auckland',
-  require       => [
+  require           => [
     Class[
       'git',
       'postgresql::lib::devel'
@@ -77,21 +77,21 @@ gitlab::shell::repo{'a test':
 # scripts work when you push to the repository.
 
 gitlab::shell::repo::hook{'update':
-  target => 'a test',
+  target  => 'a test',
   content => "#!/bin/bash\necho 'this is a test of the update hook'\npwd\nsource ./custom_hooks/update-part2",
 }
 
 gitlab::shell::repo::hook{'update-part2':
-  target => 'a test',
+  target  => 'a test',
   content => "#!/bin/bash\necho 'this is a test of a chained update hook'",
 }
 
 gitlab::shell::repo::hook{'pre-receive':
-  target => 'a test',
+  target  => 'a test',
   content => "#!/bin/bash\necho 'this is a test of the pre-receive hook'",
 }
 
 gitlab::shell::repo::hook{'post-receive':
-  target => 'a test',
+  target  => 'a test',
   content => "#!/bin/bash\necho 'this is a test of the post-receive hook'",
 }

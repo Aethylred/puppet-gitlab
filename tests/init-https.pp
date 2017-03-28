@@ -9,20 +9,20 @@ package{'cmake':
 }
 
 class{'apache':
-  default_vhost     => false,
-  server_signature  => 'off',
-  log_formats       => { common_forwarded => '%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b'},
+  default_vhost    => false,
+  server_signature => 'off',
+  log_formats      => { common_forwarded => '%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b'},
 }
 include apache::mod::passenger
 include redis
 
 class{'ruby':
-  version             => '2.0.0',
-  set_system_default  => true,
+  version            => '2.0.0',
+  set_system_default => true,
 }
 class{'ruby::dev':
-  bundler_package   => 'bundler',
-  bundler_provider  => 'gem',
+  bundler_package  => 'bundler',
+  bundler_provider => 'gem',
 }
 
 include postgresql::server

@@ -18,14 +18,14 @@ include apache::mod::passenger
 include redis
 
 class{'ruby':
-  version         => '2.0.0',
-  latest_release  => true,
-  switch          => true,
-  require         => Apt::Ppa['ppa:brightbox/ruby-ng-experimental']
+  version        => '2.0.0',
+  latest_release => true,
+  switch         => true,
+  require        => Apt::Ppa['ppa:brightbox/ruby-ng-experimental']
 }
 class{'ruby::dev':
-  bundler_package   => 'bundler',
-  bundler_provider  => 'gem',
+  bundler_package  => 'bundler',
+  bundler_provider => 'gem',
 }
 
 include postgresql::server
