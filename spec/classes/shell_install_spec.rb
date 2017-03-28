@@ -1,7 +1,7 @@
 require 'spec_helper'
 describe 'gitlab::shell::install', :type => :class do
   on_supported_os.each do |os, facts|
-    if os != 'ubuntu-14.04-x86_64' then next end
+    if os != 'redhat-6-x86_64' and os != 'ubuntu-14.04-x86_64' then next end
     context "on #{os}" do
       let(:facts) do
         facts.merge({
@@ -164,22 +164,6 @@ describe 'gitlab::shell::install', :type => :class do
           ) }
         end
       end
-    end
-  end
-
-  context 'on a RedHat OS' do
-    let :facts do
-      {
-        :osfamily               => 'RedHat',
-        :operatingsystemrelease => '6',
-        :concat_basedir         => '/dne',
-        :fqdn                   => 'test.example.org',
-      }
-    end
-    it do
-      expect {
-        should contain_class('gitlab::params')
-      }.to raise_error(Puppet::Error, /The GitLab Puppet module does not support RedHat family of operating systems/)
     end
   end
 
