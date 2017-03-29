@@ -1,7 +1,7 @@
 require 'spec_helper'
 describe 'gitlab', :type => :class do
   on_supported_os.each do |os, facts|
-    # if os != 'ubuntu-14.04-x86_64' then next end
+    if ["centos-5-x86_64", "centos-6-x86_64", "ubuntu-12.04-x86_64", "redhat-5-x86_64"].include?(os) then next end
     context "on #{os}" do
       let(:facts) do
         facts.merge({
