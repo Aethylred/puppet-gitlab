@@ -17,6 +17,7 @@ class{'apache':
 include apache::mod::passenger
 include apache::mod::shib
 include redis
+include nodejs
 
 class{'ruby':
   version            => '2.0.0',

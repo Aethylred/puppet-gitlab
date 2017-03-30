@@ -20,7 +20,7 @@ describe 'gitlab::shell::install', :type => :class do
             'provider'  => 'git',
             'user'      => 'git',
             'source'    => 'https://github.com/gitlabhq/gitlab-shell.git',
-            'revision'  => 'v2.0.1',
+            'revision'  => 'v2.6.5',
             'require'   => 'User[gitlab]'
           ) }
           it { should contain_file('gitlab-shell-config').with(

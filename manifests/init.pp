@@ -78,6 +78,7 @@ class gitlab (
 ) inherits gitlab::params {
 
   require redis
+  require nodejs
 
   validate_bool($install_gl_shell, $manage_db, $enable_https, $selfsigned_certs, $audit_usernames)
   validate_bool($allow_name_change, $allow_group_creation, $enable_gravatar)

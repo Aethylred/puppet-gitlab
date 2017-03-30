@@ -85,7 +85,7 @@ describe 'gitlab', :type => :class do
         it { should contain_class('gitlab::install').with(
           'app_dir'     => '/home/git/gitlab',
           'repository'  => 'https://github.com/gitlabhq/gitlabhq.git',
-          'revision'    => '7-4-stable',
+          'revision'    => '7-14-stable',
           'user'        => 'git'
         ) }
         it { should contain_file('gitlab_app_config').with(

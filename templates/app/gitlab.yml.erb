@@ -167,8 +167,8 @@ production: &base
       #     args: { scope: 'user:email' } }
       <%- if @omniauth and ! @omniauth.empty? -%>
         <%- [@omniauth].flatten.compact.each do |provider| -%>
-          <%- case provider['provider']-%>
-            <%- when 'github' -%>
+          <%- case provider['provider'] 
+            when 'github' -%>
       - { name: 'github', app_id: '<%= provider['app_id'] %>',
           app_secret: '<%= provider['app_secret'] %>',
           args: { scope: 'user:email' } }
@@ -179,7 +179,6 @@ production: &base
       - { name: 'google_oauth2', app_id: '<%= provider['app_id'] %>',
           app_secret: '<%= provider['app_secret'] %>',
           args: { access_type: 'offline', approval_prompt: '' } }
-            <%- else -%>
           <%- end -%>
         <%- end -%>
       <%- end -%>

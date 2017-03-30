@@ -20,7 +20,7 @@ describe 'gitlab::install', :type => :class do
             'provider'  => 'git',
             'user'      => 'git',
             'source'    => 'https://github.com/gitlabhq/gitlabhq.git',
-            'revision'  => '7-4-stable',
+            'revision'  => '7-14-stable',
             'require'   => 'User[gitlab]'
           ) }
           it { should contain_file('gitlab_app_dir').with(

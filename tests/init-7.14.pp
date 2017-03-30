@@ -40,9 +40,9 @@ class {'postgresql::lib::devel':
 class{'gitlab':
   gitlab_url        => 'http://localhost/',
   gitlab_app_repo   => 'https://github.com/gitlabhq/gitlabhq.git',
-  gitlab_app_rev    => '7-7-stable',
+  gitlab_app_rev    => '7-14-stable',
   gitlab_shell_repo => 'https://github.com/gitlabhq/gitlab-shell.git',
-  gitlab_shell_rev  => 'v2.4.1',
+  gitlab_shell_rev  => 'v2.6.5',
   require           => [
     Class[
       'git',
