@@ -1,4 +1,4 @@
-#!/bin/sh
+#! /bin/sh
 
 # GITLAB
 # Maintainer: @randx
@@ -23,6 +23,7 @@
 # An example defaults file can be found in lib/support/init.d/gitlab.default.example
 ###
 
+
 # This file is managed by Puppet, changes may be overwritten.
 
 ### Environment variables
@@ -32,23 +33,23 @@ RAILS_ENV="production"
 # internal /bin/sh variables such as PATH, EDITOR or SHELL.
 app_user="<%= @user %>"
 app_root="<%= @app_dir %>"
-pid_path="$app_root/tmp/pids"
-socket_path="$app_root/tmp/sockets"
-sidekiq_pid_path="$pid_path/sidekiq.pid"
+pid_path="${app_root}/tmp/pids"
+socket_path="${app_root}/tmp/sockets"
+sidekiq_pid_path="${pid_path}/sidekiq.pid"
+shell_path="/bin/bash"
 
 # Read configuration variable file if it is present
 test -f /etc/default/gitlab && . /etc/default/gitlab
 
 # Switch to the app_user if it is not he/she who is running the script.
-if [ "$USER" != "$app_user" ]; then
-  eval su - "$app_user" -c $(echo \")$0 "$@"$(echo \"); exit;
+if [ `whoami` != "${app_user}" ]; then
+  eval su - "${app_user}" -s ${shell_path} -c "$(echo \")"$0 "$@"$(echo \"); exit;
 fi
 
 # Switch to the gitlab path, exit on failure.
-if ! cd "$app_root" ; then
- echo "Failed to cd into $app_root, exiting!";  exit 1
+if ! cd "${app_root}" ; then
+ echo "Failed to cd into ${app_root}, exiting!";  exit 1
 fi
-
 
 ### Init Script functions
 
@@ -86,7 +87,6 @@ wait_for_pids(){
 # Only after start() is run should the pids change. Sidekiq sets it's own pid.
 check_pids
 
-
 ## Checks whether the different parts of the service are already running or not.
 check_status(){
   check_pids
@@ -119,6 +119,7 @@ check_stale_pids(){
   fi
 }
 
+echo "Test 2"
 ## If no parts of the service is running, bail out.
 exit_if_not_running(){
   check_stale_pids
@@ -217,7 +218,7 @@ case "$1" in
         restart_gitlab
         ;;
   reload|force-reload)
-  reload_gitlab
+	reload_gitlab
         ;;
   status)
         print_status
@@ -229,4 +230,5 @@ case "$1" in
         ;;
 esac
 
+echo "Test 3"
 exit

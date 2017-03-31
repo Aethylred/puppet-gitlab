@@ -275,9 +275,9 @@ class gitlab (
   file{'gitlab_init_script':
     ensure  => 'file',
     path    => '/etc/init.d/gitlab',
-    owner   => $user,
-    group   => $user,
-    mode    => '0744',
+    # owner   => $user,
+    # group   => $user,
+    mode    => '0755',
     content => template('gitlab/app/gitlab_init.d.erb'),
     require => File['gitlab_etc_default'],
   }
