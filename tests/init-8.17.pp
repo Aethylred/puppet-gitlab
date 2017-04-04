@@ -27,9 +27,8 @@ package{'cmake':
 }
 
 class{'apache':
-  default_vhost    => false,
-  server_signature => 'off',
-  log_formats      => { common_forwarded => '%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b'},
+  default_vhost => false,
+  log_formats   => { common_forwarded => '%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b'},
 }
 include apache::mod::passenger
 include redis
@@ -49,15 +48,15 @@ class {'postgresql::lib::devel':
   link_pg_config => false,
 }
 
-# Upload some SSL certificates and keys here.
-
 # Setting the gitlab_url used by gitlab shell to use localhost
 # because the FQDN of a test VM is unlikly to be real.
 class{'gitlab':
-  gitlab_url    => 'https://localhost/',
-  enable_https  => true,
-  redirect_http => true,
-  require       => [
+  gitlab_url        => 'http://localhost/',
+  gitlab_app_repo   => 'https://github.com/gitlabhq/gitlabhq.git',
+  gitlab_app_rev    => 'v8.17.4',
+  gitlab_shell_repo => 'https://github.com/gitlabhq/gitlab-shell.git',
+  gitlab_shell_rev  => 'v4.1.1',
+  require           => [
     Class[
       'git',
       'postgresql::lib::devel'

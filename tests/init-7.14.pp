@@ -1,16 +1,30 @@
 class{'git': }
 
 # required to meet dependencies for bundling the gems
-package{'libicu-dev':
-  ensure => 'present',
+
+case $::osfamily{
+  'Debian':{
+    $dep_packages = ['libicu-dev', 'libkrb5-dev']
+  }
+  'RedHat':{
+    class{'epel':
+      before => Class['redis','nodejs','apache','ruby'],
+    }
+    $dep_packages = ['libicu-devel', 'krb5-devel', 'gcc-c++', 'zlib-devel', 'libxml2-devel']
+  }
+  default:{
+    fail("The GitLab Puppet module does not support ${::osfamily} family of operating systems")
+  }
 }
 
-package{'libkrb5-dev':
+package{$dep_packages:
   ensure => 'present',
+  before => Class['gitlab','redis','nodejs'],
 }
 
 package{'cmake':
   ensure => 'present',
+  before => Class['gitlab'],
 }
 
 class{'apache':
@@ -19,7 +33,10 @@ class{'apache':
 }
 include apache::mod::passenger
 include redis
-include nodejs
+class{'nodejs':
+  npm_package_ensure => 'present',
+  before             => Class['gitlab'],
+}
 
 class{'ruby':
   version            => '2.0.0',
@@ -48,10 +65,5 @@ class{'gitlab':
       'git',
       'postgresql::lib::devel'
     ],
-    Package[
-      'libicu-dev',
-      'cmake',
-      'libkrb5-dev'
-    ]
   ]
 }

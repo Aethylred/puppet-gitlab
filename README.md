@@ -8,6 +8,8 @@ This Puppet module installs, manages and configures the [GitLab](http://gitlab.o
 
 As GitLab requires Ruby 2.0.0 this module has been developed to work on Ubuntu 14.04LTS which uses this as it's natural Ruby version. Work has been done to try and make it work with Ubuntu 12.04LTS, but runs into issues getting the gems installed correctly.
 
+RedHat and CentOS distributions require the EPEL repository set up.
+
 # Supported Gitlab Versions
 
 This module has been used on:

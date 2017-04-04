@@ -154,11 +154,11 @@ class gitlab (
   }
 
   file{'gitlab_home':
-    ensure  => 'directory',
-    path    => $user_home,
-    owner   => $user,
-    group   => $user,
-    recurse => true,
+    ensure => 'directory',
+    path   => $user_home,
+    owner  => $user,
+    group  => $user,
+    mode   => '0755'
   }
 
   file{'gitlab_repostiories_dir':
@@ -333,11 +333,13 @@ class gitlab (
     require     => Ruby::Rake['gitlab_setup'],
   }
 
+  # Need some clever here to work with systemd when appropriate
   service{'gitlab':
     ensure     => 'running',
     enable     => true,
     hasstatus  => true,
     hasrestart => true,
+    provider   => 'init',
     require    => File['gitlab_init_script'],
   }
 
@@ -360,7 +362,7 @@ class gitlab (
     }
   ]
 
-  $vhost_custom_fragment = "  CustomLog /var/log/apache2/gitlab_${servername}_forwarded.log common_forwarded\n  CustomLog /var/log/apache2/gitlab_${servername}_access.log combined env=!dontlog\n  CustomLog /var/log/apache2/gitlab_${servername}.log combined"
+  $vhost_custom_fragment = "  CustomLog ${::apache::logroot}/gitlab_${servername}_forwarded.log common_forwarded\n  CustomLog ${::apache::logroot}/gitlab_${servername}_access.log combined env=!dontlog\n  CustomLog ${::apache::logroot}/gitlab_${servername}.log combined"
 
   if $enable_https {
     if $redirect_http {
@@ -472,7 +474,7 @@ class gitlab (
           }
         ],
         error_documents       => $vhost_error_docs,
-        error_log_file        => "gitlab.${servername}.log",
+        error_log_file        => "gitlab_${servername}.log",
         custom_fragment       => $vhost_custom_fragment,
         allow_encoded_slashes => 'nodecode',
         require               => [
@@ -498,7 +500,7 @@ class gitlab (
         }
       ],
       error_documents       => $vhost_error_docs,
-      error_log_file        => "gitlab.${servername}.log",
+      error_log_file        => "gitlab_${servername}.log",
       allow_encoded_slashes => 'nodecode',
       custom_fragment       => $vhost_custom_fragment,
       require               => [
