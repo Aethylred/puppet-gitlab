@@ -474,7 +474,7 @@ class gitlab (
           }
         ],
         error_documents       => $vhost_error_docs,
-        error_log_file        => "gitlab_${servername}.log",
+        error_log_file        => "gitlab_${servername}_error.log",
         custom_fragment       => $vhost_custom_fragment,
         allow_encoded_slashes => 'nodecode',
         require               => [
@@ -500,7 +500,7 @@ class gitlab (
         }
       ],
       error_documents       => $vhost_error_docs,
-      error_log_file        => "gitlab_${servername}.log",
+      error_log_file        => "gitlab_${servername}_error.log",
       allow_encoded_slashes => 'nodecode',
       custom_fragment       => $vhost_custom_fragment,
       require               => [

@@ -36,7 +36,7 @@ include redis
 include nodejs
 
 class{'ruby':
-  version            => '2.0.0',
+  version            => '2.1.0',
   set_system_default => true,
 }
 

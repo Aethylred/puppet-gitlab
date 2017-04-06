@@ -4,7 +4,27 @@ class{'git': }
 
 case $::osfamily{
   'Debian':{
-    $dep_packages = ['libicu-dev', 'libkrb5-dev']
+    $dep_packages = [
+      'build-essential',
+      'zlib1g-dev',
+      'libyaml-dev',
+      'libssl-dev',
+      'libgdbm-dev',
+      'libreadline-dev',
+      'libncurses5-dev',
+      'libffi-dev',
+      'curl',
+      'openssh-server',
+      'checkinstall',
+      'libxml2-dev',
+      'libxslt-dev',
+      'libcurl4-openssl-dev',
+      'libicu-dev',
+      'logrotate',
+      'python-docutils',
+      'cmake',
+      'libkrb5-dev'
+    ]
   }
   'RedHat':{
     class{'epel':
@@ -22,11 +42,6 @@ package{$dep_packages:
   before => Class['gitlab','redis','nodejs'],
 }
 
-package{'cmake':
-  ensure => 'present',
-  before => Class['gitlab'],
-}
-
 class{'apache':
   default_vhost => false,
   log_formats   => { common_forwarded => '%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b'},
@@ -34,12 +49,12 @@ class{'apache':
 include apache::mod::passenger
 include redis
 class{'nodejs':
-  npm_package_ensure => 'present',
+  #npm_package_ensure => 'present',
   before             => Class['gitlab'],
 }
 
 class{'ruby':
-  version            => '2.0.0',
+  version            => '2.1.0',
   set_system_default => true,
 }
 class{'ruby::dev':

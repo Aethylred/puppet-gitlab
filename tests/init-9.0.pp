@@ -24,6 +24,13 @@ case $::osfamily{
       'cmake',
       'libkrb5-dev'
     ]
+    include apt
+    package{['python-software-properties','software-properties-common']:
+      ensure => present,
+    }
+    -> apt::ppa{ 'ppa:brightbox/ruby-ng':
+      before => Class['ruby'],
+    }
   }
   'RedHat':{
     class{'epel':
@@ -41,7 +48,6 @@ package{$dep_packages:
   before => Class['gitlab','redis','nodejs'],
 }
 
-
 class{'apache':
   default_vhost => false,
   log_formats   => { common_forwarded => '%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b'},
@@ -54,12 +60,17 @@ class{'nodejs':
 }
 
 class{'ruby':
-  version            => '2.0.0',
+  version            => '2.1.0',
   set_system_default => true,
 }
 class{'ruby::dev':
   bundler_package  => 'bundler',
   bundler_provider => 'gem',
+}
+package { 'ruby-augeas':
+    ensure   => installed,
+    provider => gem,
+    require  => Class['ruby'],
 }
 
 include postgresql::server
@@ -72,9 +83,9 @@ class {'postgresql::lib::devel':
 class{'gitlab':
   gitlab_url        => 'http://localhost/',
   gitlab_app_repo   => 'https://github.com/gitlabhq/gitlabhq.git',
-  gitlab_app_rev    => '7-7-stable',
+  gitlab_app_rev    => '9-0-stable',
   gitlab_shell_repo => 'https://github.com/gitlabhq/gitlab-shell.git',
-  gitlab_shell_rev  => 'v2.4.1',
+  gitlab_shell_rev  => 'v5.0.0',
   require           => [
     Class[
       'git',

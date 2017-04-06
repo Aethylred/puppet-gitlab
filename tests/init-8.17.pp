@@ -3,7 +3,34 @@ class{'git': }
 # required to meet dependencies for bundling the gems
 case $::osfamily{
   'Debian':{
-    $dep_packages = ['libicu-dev', 'libkrb5-dev']
+    $dep_packages = [
+      'build-essential',
+      'zlib1g-dev',
+      'libyaml-dev',
+      'libssl-dev',
+      'libgdbm-dev',
+      'libreadline-dev',
+      'libncurses5-dev',
+      'libffi-dev',
+      'curl',
+      'openssh-server',
+      'checkinstall',
+      'libxml2-dev',
+      'libxslt-dev',
+      'libcurl4-openssl-dev',
+      'libicu-dev',
+      'logrotate',
+      'python-docutils',
+      'cmake',
+      'libkrb5-dev'
+    ]
+    include apt
+    package{['python-software-properties','software-properties-common']:
+      ensure => present,
+    }
+    -> apt::ppa{ 'ppa:brightbox/ruby-ng':
+      before => Class['ruby'],
+    }
   }
   'RedHat':{
     class{'epel':
@@ -21,26 +48,31 @@ package{$dep_packages:
   before => Class['gitlab','redis','nodejs'],
 }
 
-package{'cmake':
-  ensure => 'present',
-  before => Class['gitlab'],
-}
-
 class{'apache':
   default_vhost => false,
   log_formats   => { common_forwarded => '%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b'},
 }
 include apache::mod::passenger
 include redis
-include nodejs
+class{'nodejs':
+  #npm_package_ensure => 'present',
+  before             => Class['gitlab'],
+}
 
 class{'ruby':
-  version            => '2.0.0',
+  version            => '2.3',
+  suppress_warnings  => true,
+  ruby_package       => 'installed',
   set_system_default => true,
 }
 class{'ruby::dev':
   bundler_package  => 'bundler',
   bundler_provider => 'gem',
+}
+package { 'ruby-augeas':
+    ensure   => installed,
+    provider => gem,
+    require  => Class['ruby','ruby::dev'],
 }
 
 include postgresql::server
@@ -53,7 +85,7 @@ class {'postgresql::lib::devel':
 class{'gitlab':
   gitlab_url        => 'http://localhost/',
   gitlab_app_repo   => 'https://github.com/gitlabhq/gitlabhq.git',
-  gitlab_app_rev    => 'v8.17.4',
+  gitlab_app_rev    => '8-16-stable',
   gitlab_shell_repo => 'https://github.com/gitlabhq/gitlab-shell.git',
   gitlab_shell_rev  => 'v4.1.1',
   require           => [
